@@ -10,7 +10,9 @@
 <forma> é o id de uma forma da pasta (--formas; sem ela, as de exemplo) ou o caminho de um .json; <estado> é o nome
 de um estado (os que vêm com a biblioteca e os de --animacoes) ou o caminho de um .json. --pacote vivo troca os seis
 estados de sempre pelos do pacote "vivo"; --pacote 3d, pelos que giram e têm câmera (e liga o volume: luz, relevo,
-chão e sombra). --volume liga o volume em qualquer pacote; --chapado desliga. Os arquivos saem onde você disser (-o), ou na pasta atual; nunca dentro da
+chão e sombra); --pacote terminal, pelos de terminal (prompt, barra de progresso, [ OK ]), em caracteres.
+--estilo terminal desenha qualquer pacote em caracteres (--tinta ascii|blocos|contorno, --fosforo verde|ambar|branco|
+mascote). --volume liga o volume em qualquer pacote; --chapado desliga. Os arquivos saem onde você disser (-o), ou na pasta atual; nunca dentro da
 biblioteca.
 """
 from __future__ import annotations
@@ -24,10 +26,11 @@ from typing import List, Optional
 from PIL import Image, ImageDraw
 
 from .animacao import AnimacaoInvalida, Biblioteca, carregar_animacao, pacotes, validar_animacao
-from .desenho import Estilo, Volume, desenhar, fonte_padrao, forma_de
-from .formas import COR, DefinicaoInvalida, carregar_definicao, carregar_pasta, cor_hex, validar_definicao
+from .desenho import Estilo, Terminal, Volume, desenhar, fonte_padrao, forma_de
+from .formas import COR, DefinicaoInvalida, carregar_definicao, carregar_pasta, cor_hex, cores_da_pasta, validar_definicao
 from .palco import Enquadramento
 from .svg import desenhar_svg
+from .terminal import TINTAS
 
 PACOTE = Path(__file__).resolve().parent
 CORES = ("#E07A57", "#7FB77E", "#6FA8DC", "#E8B04B", "#C58AD8", "#6FA3A0", "#E58FB0")
@@ -66,11 +69,17 @@ def _animacao(args, bib: Biblioteca, nome: str):
 
 
 def _cor(args, defn, formas: Optional[dict] = None):
-    """A cor do corpo: --cor, ou a da forma (cada forma da pasta tem a sua, pela posição dela na pasta)."""
+    """A cor do corpo: --cor; ou a da forma no _cores.json da pasta; ou uma pela posição dela na pasta."""
     if args.cor:
         if not COR.fullmatch(args.cor):
             raise ErroDeUso(f"--cor: use #RRGGBB, veio {args.cor!r}")
         return cor_hex(args.cor)
+    try:
+        sugeridas = cores_da_pasta(args.formas)
+    except DefinicaoInvalida:
+        sugeridas = {}
+    if defn.id in sugeridas:
+        return cor_hex(sugeridas[defn.id])
     if formas is None:
         try:
             formas = _formas(args)
@@ -89,14 +98,28 @@ def _saida(args, padrao: str) -> Path:
     return destino
 
 
-def _volume(args) -> Optional[Volume]:
-    """--volume liga a luz e o relevo; o pacote 3d já vem com eles (--chapado desliga)."""
-    return Volume() if (args.volume or args.pacote == "3d") and not args.chapado else None
+def _modo(args) -> str:
+    """chapado, volume ou terminal: o de --estilo; sem ele, --volume, --chapado ou o que o pacote pede (o 3d vem
+    com volume; o terminal, em estilo terminal)."""
+    if args.estilo:
+        return args.estilo
+    if args.chapado:
+        return "chapado"
+    if args.volume:
+        return "volume"
+    return {"3d": "volume", "terminal": "terminal"}.get(args.pacote or "", "chapado")
 
 
 def _estilo(args, escala: int) -> Estilo:
+    modo = _modo(args)
+    terminal = None
+    if modo == "terminal":
+        try:
+            terminal = Terminal(tinta=args.tinta, fosforo=args.fosforo, fonte=args.fonte)
+        except ValueError as e:
+            raise ErroDeUso(str(e)) from None
     return Estilo(Enquadramento().ampliado(escala), fonte=fonte_padrao(args.fonte, 2) if args.fonte else None,
-                  volume=_volume(args))
+                  volume=Volume() if modo == "volume" else None, terminal=terminal)
 
 
 def _fonte_rotulo(args, tam: float):
@@ -109,7 +132,8 @@ def _celula(forma, anim, t: float, cor, estilo: Estilo, fundo) -> Image.Image:
     base = Image.new("RGBA", camada.size, fundo + (255,))
     base.alpha_composite(camada)
     enq = estilo.enquadramento
-    return base.convert("RGB").resize((enq.largura, enq.altura), Image.LANCZOS)
+    # no terminal, a média exata de cada bloco de pixels: as células continuam nítidas
+    return base.convert("RGB").resize((enq.largura, enq.altura), Image.BOX if estilo.terminal else Image.LANCZOS)
 
 
 # ---------- os comandos ----------
@@ -203,7 +227,7 @@ def gif(args) -> int:
 def svg(args) -> int:
     defn, bib = _forma(args, args.forma), _biblioteca(args)
     anim = _animacao(args, bib, args.estado)
-    estilo = Estilo(Enquadramento().ampliado(args.escala), volume=_volume(args))
+    estilo = _estilo(args, args.escala)
     texto = desenhar_svg(forma_de(defn), anim.parametros(args.t), anim, args.t, _cor(args, defn), 1.0, estilo)
     destino = _saida(args, f"{defn.id}-{anim.estado}-{args.t:g}.svg")
     destino.write_text(texto, encoding="utf-8")
@@ -264,6 +288,11 @@ def _comuns(p: argparse.ArgumentParser, cor: bool = True) -> None:
         p.add_argument("--fonte", metavar="ARQ.ttf", help="fonte TTF do zZ e dos rótulos (padrão: a do Pillow)")
         p.add_argument("--volume", action="store_true", help="com volume: luz, relevo, chão e sombra (em qualquer pacote)")
         p.add_argument("--chapado", action="store_true", help="sem volume, mesmo no pacote 3d")
+        p.add_argument("--estilo", choices=("chapado", "volume", "terminal"),
+                       help="como desenhar: chapado, com volume ou em caracteres de terminal (em qualquer pacote)")
+        p.add_argument("--tinta", choices=TINTAS, default="ascii", help="no terminal: ascii, blocos ou contorno")
+        p.add_argument("--fosforo", metavar="COR", default="verde",
+                       help="no terminal: verde, ambar, branco, mascote (a cor do corpo) ou #RRGGBB")
 
 
 def _positivo(tipo):

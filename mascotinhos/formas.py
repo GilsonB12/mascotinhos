@@ -312,12 +312,15 @@ def carregar_definicao(arquivo) -> Definicao:
 
 
 def carregar_pasta(pasta=None) -> Dict[str, Definicao]:
-    """Todas as formas (*.json) de uma pasta, em ordem de id. Sem pasta: as de exemplo desta biblioteca."""
+    """Todas as formas (*.json) de uma pasta, em ordem de id. Sem pasta: as doze que vêm com a biblioteca.
+    Arquivos que começam com "_" não são formas (o _cores.json, por exemplo)."""
     pasta = Path(pasta) if pasta is not None else PASTA_EXEMPLOS
     if not pasta.is_dir():
         raise DefinicaoInvalida(f"pasta de formas não encontrada: {pasta}")
     formas = {}
     for arq in sorted(pasta.glob("*.json")):
+        if arq.name.startswith("_"):
+            continue
         d = carregar_definicao(arq)
         formas[d.id] = d
     if not formas:
@@ -325,8 +328,29 @@ def carregar_pasta(pasta=None) -> Dict[str, Definicao]:
     return formas
 
 
+COR_PADRAO = "#E07A57"
+
+
+def cores_da_pasta(pasta=None) -> Dict[str, str]:
+    """As cores sugeridas das formas de uma pasta: o arquivo opcional _cores.json, {"id": "#RRGGBB"}. Sem pasta,
+    as das formas que vêm com a biblioteca. Sem o arquivo, {}."""
+    arq = (Path(pasta) if pasta is not None else PASTA_EXEMPLOS) / "_cores.json"
+    if not arq.is_file():
+        return {}
+    dados = _ler_json(arq)
+    if not isinstance(dados, dict) or not all(isinstance(k, str) and isinstance(v, str) and COR.fullmatch(v)
+                                              for k, v in dados.items()):
+        raise DefinicaoInvalida(f"{arq.name}: deve ser um objeto {{\"id\": \"#RRGGBB\"}}")
+    return dados
+
+
+def cor_sugerida(forma_id: str) -> str:
+    """A cor de uma das formas que vêm com a biblioteca (ou a padrão, para as outras)."""
+    return cores_da_pasta().get(forma_id, COR_PADRAO)
+
+
 def exemplos() -> Dict[str, Definicao]:
-    """As formas de exemplo que vêm com a biblioteca."""
+    """As doze formas que vêm com a biblioteca: Bolota, Broto e Fantasma, e os nove mascotes do Ombro Screen."""
     return carregar_pasta(PASTA_EXEMPLOS)
 
 

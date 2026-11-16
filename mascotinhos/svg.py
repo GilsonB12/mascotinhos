@@ -10,6 +10,7 @@ from typing import List, Optional, Sequence, Union
 
 from .animacao import Animacao, Biblioteca
 from .desenho import RGB, Estilo, Forma, _animacao, _cor, forma_de, pintar
+from .terminal import svg_terminal
 from .volume import cor_clara, cor_escura
 
 FAMILIA = "JetBrains Mono, ui-monospace, Menlo, monospace"
@@ -150,13 +151,15 @@ def desenhar_svg(forma: Forma, p: dict, anim: Optional[Animacao], t: float, cor:
     from .desenho import ESTILO_PADRAO
 
     estilo = estilo or ESTILO_PADRAO
+    if estilo.terminal is not None:
+        return svg_terminal(forma, p, anim, t, tuple(cor), alpha_extras, estilo)
     pintor = PintorSVG(estilo)
     pintar(pintor, forma, p, anim, t, tuple(cor), alpha_extras, estilo)
     return pintor.texto_svg()
 
 
-def quadro_svg(avatar, estado: Union[str, Animacao], t: float, cor: Union[str, Sequence[int]] = "#E07A57",
+def quadro_svg(avatar, estado: Union[str, Animacao], t: float, cor: Union[str, Sequence[int], None] = None,
                estilo: Optional[Estilo] = None, biblioteca: Optional[Biblioteca] = None) -> str:
     """O quadro pronto em SVG: a forma `avatar` no `estado` no instante `t` (como desenho.quadro, em vetor)."""
     anim = _animacao(estado, biblioteca)
-    return desenhar_svg(forma_de(avatar), anim.parametros(t), anim, t, _cor(cor), 1.0, estilo)
+    return desenhar_svg(forma_de(avatar), anim.parametros(t), anim, t, _cor(cor, avatar), 1.0, estilo)

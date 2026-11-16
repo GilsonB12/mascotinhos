@@ -39,7 +39,7 @@ class Comandos(unittest.TestCase):
         codigo, _, err = rodar("folha", "-o", self.tmp / "f.png", "--estados", "ocioso,reset")
         self.assertEqual(codigo, 0, err)
         with Image.open(self.tmp / "f.png") as img:
-            self.assertEqual(img.size, (12 + 90 + 2 * 156 + 12, 26 + 3 * 170 + 12))
+            self.assertEqual(img.size, (12 + 90 + 2 * 156 + 12, 26 + 12 * 170 + 12))
         self.assertEqual(rodar("tira", "broto", "esperando", "--quadros", 4, "-o", self.tmp / "t.png")[0], 0)
         with Image.open(self.tmp / "t.png") as img:
             self.assertEqual(img.size, (4 * 156, 170 + 18))
@@ -61,8 +61,8 @@ class Comandos(unittest.TestCase):
         self.assertIn("girando", out)
 
     def test_validar(self):
-        codigo, out, _ = rodar("validar", *sorted(PASTA_EXEMPLOS.glob("*.json")))
-        self.assertEqual((codigo, out.count("ok ")), (0, 3))
+        codigo, out, _ = rodar("validar", *sorted(PASTA_EXEMPLOS.glob("[!_]*.json")))
+        self.assertEqual((codigo, out.count("ok ")), (0, 12))
         ruim = self.tmp / "ruim.json"
         ruim.write_text(json.dumps({"formato": "mascotinhos/animacao", "versao": 1, "estado": "ruim",
                                     "campos": {"dy": {"onda": {"amp": 3}}}}), encoding="utf-8")

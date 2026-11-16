@@ -16,11 +16,14 @@ from __future__ import annotations
 
 import math
 
-from .palco import BY1, CX, TAU, bezier, com_alpha, quad
+from .palco import BY1, CX, TAU, VB_Y, bezier, com_alpha, quad
 
 # tipo -> {parâmetro: (padrão, tipo)}; o tipo é conferido ao ler a animação (uma tupla = uma das opções)
 _POS, _BOOL, _NUM, _NAO_NEG, _INT = "número > 0", "sim/não", "número", "número >= 0", "inteiro > 0"
-ANCORAS = ("topo", "topo-dir", "topo-esq", "dir", "esq", "centro", "base")
+ANCORAS = ("topo", "topo-dir", "topo-esq", "dir", "esq", "centro", "base", "rodape", "cabecalho")
+_TEXTO, _NOME, _LETRA = "texto", "nome de dado", "um caractere"
+ALINHA = ("centro", "esq", "dir")
+FIGURAS = {"barras": "|/-\\", "braille": "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏", "pontos": ".oOo"}
 CORES = ("corpo", "texto", "verde", "ambar", "azul", "gota", "vermelho")
 
 
@@ -52,6 +55,19 @@ ESQUEMAS = {
     "engrenagem": {"periodo": (4.0, _NUM), "cor": ("texto", CORES), **_lugar("topo-dir", -6, -30)},
     "visto": {"desenha": (0.45, _POS), "atraso": (0.25, _NAO_NEG), "periodo": (2.6, _POS), "cor": ("verde", CORES),
               "segue_pulo": (True, _BOOL), **_lugar("topo", 0, -60)},
+    # os de terminal: texto. "{v}" no texto vira o valor: o de "valor", ou o que quem desenha passar em "dados"
+    # com o nome de "dado" (uma porcentagem de verdade, por exemplo)
+    "prompt": {"texto": ("> trabalhando", _TEXTO), "digita": (1.4, _NAO_NEG), "ciclo": (0.0, _NAO_NEG),
+               "cursor": (True, _BOOL), "pisca": (0.9, _POS), "dado": ("", _NOME), "valor": (0.0, _NUM),
+               "alinha": ("centro", ALINHA), **_lugar("rodape", 0, 0)},
+    "spinner": {"figura": ("barras", tuple(FIGURAS)), "periodo": (0.9, _POS), **_lugar("topo-dir", 8, -30)},
+    "barra": {"modo": ("fixo", ("fixo", "enchendo", "esvaziando")), "valor": (50.0, _NUM), "dado": ("", _NOME),
+              "largura": (10, _INT), "ciclo": (3.2, _POS), "de": (0.2, _NAO_NEG), "ate": (1.4, _POS),
+              "cheio": ("#", _LETRA), "vazio": (".", _LETRA), "pct": (True, _BOOL), "treme": (False, _BOOL),
+              "alinha": ("centro", ALINHA), **_lugar("rodape", 0, 0)},
+    "rotulo": {"texto": ("[ OK ]", _TEXTO), "aparece": (0.0, _NAO_NEG), "some": (0.0, _NAO_NEG), "pisca": (0.0, _NAO_NEG),
+               "ciclo": (0.0, _NAO_NEG), "inverso": (False, _BOOL), "segue_pulo": (False, _BOOL), "dado": ("", _NOME),
+               "valor": (0.0, _NUM), "alinha": ("centro", ALINHA), **_lugar("topo", 0, -50)},
 }
 DESCRICOES = {
     "zz": "z e Z subindo e sumindo do lado direito de cima (dormindo)",
@@ -69,14 +85,19 @@ DESCRICOES = {
     "faiscas": "estrelinhas que saem em leque de um ponto e somem (uma vez, ou a cada ciclo)",
     "engrenagem": "uma engrenagem girando (trabalho em andamento)",
     "visto": "um ✓ que se desenha traço a traço, dá um saltinho e depois flutua",
+    "prompt": "uma linha de terminal sendo digitada (> trabalhando_), com o cursor piscando",
+    "spinner": "o giratório de espera: | / - \\, braille ou pontos",
+    "barra": "uma barra de progresso [#####.....] 52%: fixa, enchendo ou esvaziando",
+    "rotulo": "um texto que aparece, pisca ou fica: [ OK ], ! LIMITE 92%, ?",
 }
 
 
 class Contexto:
     """O que um extra precisa saber do quadro."""
-    __slots__ = ("t", "a", "cor", "forma", "enq", "paleta", "_pulo", "lente", "fator_x")
+    __slots__ = ("t", "a", "cor", "forma", "enq", "paleta", "_pulo", "lente", "fator_x", "dados")
 
-    def __init__(self, t, a, cor, forma, enq, paleta, pulo, lente=None, fator_x=1.0):
+    def __init__(self, t, a, cor, forma, enq, paleta, pulo, lente=None, fator_x=1.0, dados=None):
+        self.dados = dados  # os valores de quem desenha, para os textos com "dado" (None = os de "valor")
         self.t, self.a, self.cor, self.forma, self.enq, self.paleta, self._pulo = t, a, cor, forma, enq, paleta, pulo
         self.lente = lente  # no 3D: profundidade -> o enquadramento visto pela câmera (os extras com "prof")
         self.fator_x = fator_x  # no 3D: o quanto a silhueta estreitou com o giro (as âncoras dos lados acompanham)
@@ -183,7 +204,8 @@ def _ancora(c: Contexto, p: dict):
     """O ponto do contorno pedido, mais o deslocamento, em unidades do palco."""
     f, meio = c.forma, (c.forma.y0 + BY1) / 2
     x, y = {"topo": (CX, f.y0), "topo-dir": (f.x1, f.y0), "topo-esq": (f.x0, f.y0), "dir": (f.x1, meio),
-            "esq": (f.x0, meio), "centro": (CX, meio), "base": (CX, BY1)}[p["ancora"]]
+            "esq": (f.x0, meio), "centro": (CX, meio), "base": (CX, BY1), "rodape": (CX, BY1 + 50),
+            "cabecalho": (CX, VB_Y + 6)}[p["ancora"]]
     if c.fator_x != 1.0:  # o corpo virou: os lados chegaram mais perto do meio
         x = CX + (x - CX) * c.fator_x
     return x + p["dx"], y + p["dy"]
@@ -361,7 +383,86 @@ def _visto(pt, c: Contexto, p: dict) -> None:
              max(1.0, 12 * p["tamanho"] * c.enq.esc * c.enq.s))
 
 
-DESENHOS = {"zz": _zz, "pontinhos": _pontinhos, "interrogacao": _interrogacao, "gota": _gota, "confete": _confete,
+# ---------- os de terminal: o que cada um mostra (o texto) é igual no estilo terminal e fora dele ----------
+def valor_de(c: Contexto, p: dict):
+    """O valor de um extra de texto: o de quem desenha (dados[p["dado"]]), ou o do arquivo (p["valor"])."""
+    if p["dado"] and c.dados and p["dado"] in c.dados:
+        return c.dados[p["dado"]]
+    return p["valor"]
+
+
+def formatar(texto: str, v) -> str:
+    return texto.replace("{v}", str(int(round(v))) if isinstance(v, (int, float)) else str(v))
+
+
+def texto_do_prompt(c: Contexto, p: dict):
+    """(o que já foi digitado, o cursor está aceso?)"""
+    texto = formatar(p["texto"], valor_de(c, p))
+    tt = c.t % p["ciclo"] if p["ciclo"] else c.t
+    fixo = 2 if texto.startswith("> ") else 0  # o "> " já está lá
+    n = len(texto) if not p["digita"] else min(len(texto), fixo + int(tt / p["digita"] * (len(texto) - fixo)))
+    digitando = n < len(texto)
+    return texto[:n], p["cursor"] and (digitando or (c.t % p["pisca"]) < p["pisca"] * .55)
+
+
+def quadro_do_spinner(c: Contexto, p: dict) -> str:
+    figuras = FIGURAS[p["figura"]]
+    return figuras[int(c.t / p["periodo"] * len(figuras)) % len(figuras)]
+
+
+def nivel_da_barra(c: Contexto, p: dict) -> float:
+    """De 0 a 100."""
+    if p["modo"] == "fixo":
+        v = valor_de(c, p)
+        return max(0.0, min(100.0, float(v) if isinstance(v, (int, float)) else 0.0))
+    cc = c.t % p["ciclo"]
+    v = 0.0 if cc < p["de"] else 100.0 if cc >= p["ate"] else (cc - p["de"]) / (p["ate"] - p["de"]) * 100
+    return v if p["modo"] == "enchendo" else 100 - v
+
+
+def texto_da_barra(c: Contexto, p: dict) -> str:
+    v, larg = nivel_da_barra(c, p), int(p["largura"])
+    n = max(0, min(larg, int(round(v / 100 * larg))))
+    return "[" + p["cheio"] * n + p["vazio"] * (larg - n) + "]" + (f" {int(v)}%" if p["pct"] else "")
+
+
+def texto_do_rotulo(c: Contexto, p: dict):
+    """O texto, ou None enquanto não aparece (antes de "aparece", depois de "some", no apagado do "pisca")."""
+    tt = c.t % p["ciclo"] if p["ciclo"] else c.t
+    if tt < p["aparece"] or (p["some"] and tt >= p["some"]):
+        return None
+    if p["pisca"] and (tt - p["aparece"]) % p["pisca"] >= p["pisca"] * .6:
+        return None
+    return formatar(p["texto"], valor_de(c, p))
+
+
+def _texto_plano(pt, c: Contexto, p: dict, texto: str) -> None:
+    """Fora do estilo terminal, os extras de texto saem com a fonte do estilo, no mesmo lugar."""
+    if not texto:
+        return
+    x, y = _ancora(c, p)
+    ancora = {"centro": "ms", "esq": "ls", "dir": "rs"}[p.get("alinha", "centro")]
+    pt.texto(c.enq.pt(x, y), texto, 30 * p["tamanho"] * c.enq.esc, com_alpha(c.paleta.texto, c.a), ancora)
+
+
+def _prompt(pt, c: Contexto, p: dict) -> None:
+    texto, cursor = texto_do_prompt(c, p)
+    _texto_plano(pt, c, p, texto + ("_" if cursor else " "))
+
+
+def _spinner(pt, c: Contexto, p: dict) -> None:
+    _texto_plano(pt, c, p, quadro_do_spinner(c, p) if p["figura"] != "braille" else "|/-\\"[int(c.t / p["periodo"] * 4) % 4])
+
+
+def _barra(pt, c: Contexto, p: dict) -> None:
+    _texto_plano(pt, c, p, texto_da_barra(c, p))
+
+
+def _rotulo(pt, c: Contexto, p: dict) -> None:
+    _texto_plano(pt, c, p, texto_do_rotulo(c, p) or "")
+
+
+DESENHOS = {"prompt": _prompt, "spinner": _spinner, "barra": _barra, "rotulo": _rotulo, "zz": _zz, "pontinhos": _pontinhos, "interrogacao": _interrogacao, "gota": _gota, "confete": _confete,
             "check": _check, "brilhos": _brilhos, "zzz": _zzz, "gotas": _gotas, "sinal": _sinal, "bateria": _bateria, "linhas": _linhas,
             "faiscas": _faiscas, "engrenagem": _engrenagem, "visto": _visto}
 

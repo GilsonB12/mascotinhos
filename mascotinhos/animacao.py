@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from . import extras as _extras
+from . import fonte_bitmap
 from .formas import ID
 from .movimento import CAMPOS, NEUTRO, OPCIONAIS, MovimentoInvalido, compilar
 
@@ -236,6 +237,13 @@ def _extra(bruto, onde: str) -> tuple:
         elif tipo_p == "sim/não":
             if not isinstance(v, bool):
                 raise AnimacaoInvalida(f"{onde}.{chave}: deve ser true ou false, veio {v!r}")
+        elif tipo_p in ("texto", "um caractere", "nome de dado"):
+            limite = {"texto": 40, "um caractere": 1, "nome de dado": 24}[tipo_p]
+            if not isinstance(v, str) or len(v) > limite or (tipo_p != "nome de dado" and not v):
+                raise AnimacaoInvalida(f"{onde}.{chave}: deve ser {tipo_p} (até {limite} letras), veio {v!r}")
+            falta = fonte_bitmap.sem_glifo(v)
+            if falta:
+                raise AnimacaoInvalida(f"{onde}.{chave}: a fonte do terminal não tem {falta!r}")
         elif (not _numero(v) or (tipo_p == "número > 0" and v <= 0) or (tipo_p == "número >= 0" and v < 0)
               or (tipo_p == "inteiro > 0" and (v < 1 or v != int(v) or v > 24))):
             raise AnimacaoInvalida(f"{onde}.{chave}: deve ser {tipo_p}{' (até 24)' if tipo_p == 'inteiro > 0' else ''}, "
@@ -243,6 +251,8 @@ def _extra(bruto, onde: str) -> tuple:
         else:
             v = float(v)
         params[chave] = v
+    if tipo == "barra" and params["modo"] != "fixo" and not params["de"] < params["ate"] <= params["ciclo"]:
+        raise AnimacaoInvalida(f"{onde}: a barra que enche ou esvazia precisa de de < ate <= ciclo")
     if tipo == "bateria" and params["modo"] == "enchendo" and not params["de"] < params["ate"] <= params["ciclo"]:
         raise AnimacaoInvalida(f"{onde}: a bateria enchendo precisa de de < ate <= ciclo")
     if tipo == "confete" and not params["de"] < params["ate"] <= params["ciclo"]:

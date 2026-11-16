@@ -1,0 +1,50 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "reset",
+  "ordem": 5,
+  "descricao": "O limite renovou, em terminal: \"RECARREGANDO\" e a barra enchendo até 100%; cheia, vira \"[ OK ]\" em vídeo inverso, saem faíscas e ele dá um pulo feliz (^ ^). Cabe em 3 s.",
+  "campos": {
+    "kL": 1.1,
+    "olhaY": -9
+  },
+  "trilhas": [
+    {
+      "nome": "recarga",
+      "ciclo": 3.4,
+      "fases": [
+        {"de": 0, "dur": 0.2, "nota": "murcho, olhando a bateria vazia",
+         "sy": 0.92, "sx": 1.05},
+        {"de": 0.2, "dur": 1.2, "nota": "enche junto com a bateria",
+         "sy": {"rampa": {"de": 0.92, "para": 1.05, "curva": "linear", "passos": 5}},
+         "sx": {"rampa": {"de": 1.05, "para": 0.97, "curva": "linear", "passos": 5}}},
+        {"de": 1.4, "dur": 0.3, "nota": "cheia! agacha para pular",
+         "olhos": "redondos",
+         "sy": {"rampa": {"de": 1.05, "para": 0.86, "escala": 2}},
+         "sx": {"rampa": {"de": 0.97, "para": 1.1, "escala": 2}},
+         "olhaY": -4},
+        {"de": 1.7, "dur": 0.8, "nota": "pulo feliz",
+         "olhos": "felizes",
+         "dy": {"arco": {"amp": -50}},
+         "sy": {"soma": [{"rampa": {"de": 0.86, "para": 1, "escala": 3}}, {"arco": {"amp": 0.12}}]},
+         "sx": {"soma": [{"rampa": {"de": 1.1, "para": 1, "escala": 3}}, {"arco": {"amp": -0.06}}]},
+         "olhaY": -3},
+        {"de": 2.5, "dur": 0.4, "nota": "amassa ao pousar",
+         "olhos": "felizes",
+         "sy": {"arco": {"amp": -0.12, "base": 1}},
+         "sx": {"arco": {"amp": 0.08, "base": 1}},
+         "olhaY": -3},
+        {"de": 2.9, "dur": 0.5, "nota": "assenta, contente",
+         "olhos": "felizes",
+         "sy": {"mola": {"amortece": 7, "rad": 22, "amp": 0.04, "base": 1}},
+         "olhaY": -3}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "rotulo", "texto": "RECARREGANDO", "ciclo": 3.4, "some": 1.4, "ancora": "cabecalho", "dy": 60},
+    {"tipo": "rotulo", "texto": "[ OK ]", "ciclo": 3.4, "aparece": 1.4, "inverso": true, "ancora": "cabecalho", "dy": 60},
+    {"tipo": "barra", "modo": "enchendo", "ciclo": 3.4, "de": 0.2, "ate": 1.4, "largura": 12},
+    {"tipo": "faiscas", "ciclo": 3.4, "de": 1.4, "dur": 0.9, "n": 7, "partida": 60, "raio": 90, "abertura": 200, "dy": 10}
+  ]
+}

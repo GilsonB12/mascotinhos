@@ -159,7 +159,7 @@ class Giro(unittest.TestCase):
 
 class Pacote3d(unittest.TestCase):
     def test_os_seis_estados_conferem_desenham_e_tem_3d(self):
-        self.assertEqual(oa.pacotes(), ("classico", "3d", "vivo"))
+        self.assertIn("3d", oa.pacotes())
         bib = oa.Biblioteca.carregar(pacote="3d")
         self.assertEqual(bib.estados(), ESTADOS)
         for e in ESTADOS:

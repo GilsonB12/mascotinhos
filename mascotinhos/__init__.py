@@ -13,18 +13,20 @@ from .animacao import (AnimacaoInvalida, Animacao, Biblioteca, biblioteca_padrao
                        validar_animacao)
 from .animador import DURACAO_MISTURA, REALCE, TRANSICAO, Animador, cor_sorteada
 from .desenho import Estilo, Forma, Paleta, desenhar, fonte_padrao, forma_de, quadro
-from .formas import (Definicao, DefinicaoInvalida, Olhos, carregar_definicao, carregar_pasta, cor_hex, dentro,
+from .formas import (Definicao, DefinicaoInvalida, Olhos, carregar_definicao, carregar_pasta, cor_hex, cor_sugerida,
+                     cores_da_pasta, dentro,
                      exemplos, ler_definicao, poligonos, validar_definicao)
 from .movimento import CAMPOS, NEUTRO, misturar
 from .palco import Enquadramento
+from .terminal import Terminal
 from .volume import Volume
 from .svg import desenhar_svg, quadro_svg
 
 __version__ = "0.1.0"
 __all__ = [
     "Animacao", "AnimacaoInvalida", "Animador", "Biblioteca", "CAMPOS", "DURACAO_MISTURA", "Definicao",
-    "DefinicaoInvalida", "Enquadramento", "Estilo", "Forma", "NEUTRO", "Olhos", "Paleta", "REALCE", "TRANSICAO", "Volume",
-    "biblioteca_padrao", "carregar_animacao", "carregar_definicao", "carregar_pasta", "cor_hex", "cor_sorteada",
+    "DefinicaoInvalida", "Enquadramento", "Estilo", "Forma", "NEUTRO", "Olhos", "Paleta", "REALCE", "TRANSICAO", "Terminal", "Volume",
+    "biblioteca_padrao", "carregar_animacao", "carregar_definicao", "carregar_pasta", "cor_hex", "cor_sorteada", "cor_sugerida", "cores_da_pasta",
     "dentro", "desenhar", "desenhar_svg", "exemplos", "fonte_padrao", "forma_de", "ler_animacao", "ler_definicao",
     "misturar", "pacotes", "poligonos", "quadro", "quadro_svg", "validar_animacao", "validar_definicao",
 ]

@@ -14,8 +14,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 from . import extras as _extras
 from .animacao import Animacao, Biblioteca, biblioteca_padrao
-from .formas import OLHO_COMP, OLHO_LARG, aumento_olhos, cor_hex, limites
+from .formas import OLHO_COMP, OLHO_LARG, aumento_olhos, cor_hex, cor_sugerida, limites
 from .palco import BY1, CX, H, TAU, W, Enquadramento, capsula, corpo, olhar_x
+from .terminal import Terminal, desenhar_terminal
 from .volume import Lente, Projecao, Volume, cor_escura, elipse_macia, mascara_nonzero, sombrear, tem_3d
 
 RGB = Tuple[int, int, int]
@@ -52,11 +53,13 @@ def fonte_padrao(arquivo: Optional[str] = None, s: int = 2) -> Callable[[float],
 @dataclass(frozen=True)
 class Estilo:
     """Como desenhar: o tamanho da camada, as cores fixas, a fonte (tamanho em pixels da tela -> fonte em s vezes) e,
-    se quiser, o volume (a luz e o relevo; None = chapado, como sempre)."""
+    se quiser, o volume (a luz e o relevo; None = chapado, como sempre) ou o terminal (tudo em células de caracteres;
+    com ele, o volume não vale)."""
     enquadramento: Enquadramento = field(default_factory=Enquadramento)
     paleta: Paleta = field(default_factory=Paleta)
     fonte: Optional[Callable[[float], ImageFont.ImageFont]] = None
     volume: Optional[Volume] = None
+    terminal: Optional[Terminal] = None
 
     def fonte_do_texto(self, tam: float):
         f = self.fonte or _fonte_por_s(self.enquadramento.s)
@@ -327,6 +330,8 @@ def desenhar(forma: Forma, p: dict, anim: Optional[Animacao], t: float, cor: RGB
     """Camada RGBA (o tamanho do enquadramento, em `s` vezes) com a forma na pose `p` e os extras de `anim` no
     instante `t` (segundos desde que o estado começou). `alpha_extras` apaga os extras na troca de estado."""
     estilo = estilo or ESTILO_PADRAO
+    if estilo.terminal is not None:
+        return desenhar_terminal(forma, p, anim, t, cor, alpha_extras, estilo)
     camada = Image.new("RGBA", estilo.enquadramento.tamanho, (0, 0, 0, 0))
     pintar(PintorPillow(camada, estilo), forma, p, anim, t, cor, alpha_extras, estilo)
     return camada
@@ -341,12 +346,15 @@ def _animacao(estado: Union[str, Animacao], biblioteca: Optional[Biblioteca]) ->
     return (biblioteca or biblioteca_padrao())[estado]
 
 
-def _cor(cor) -> RGB:
+def _cor(cor, avatar=None) -> RGB:
+    if cor is None:
+        cor = cor_sugerida(getattr(avatar, "id", getattr(avatar, "avatar", "")))
     return cor_hex(cor) if isinstance(cor, str) else tuple(cor)
 
 
-def quadro(avatar, estado: Union[str, Animacao], t: float, cor: Union[str, Sequence[int]] = "#E07A57",
+def quadro(avatar, estado: Union[str, Animacao], t: float, cor: Union[str, Sequence[int], None] = None,
            estilo: Optional[Estilo] = None, biblioteca: Optional[Biblioteca] = None) -> Image.Image:
-    """O quadro pronto: a forma `avatar` (Definicao) no `estado` (nome ou Animacao) no instante `t`, em RGBA."""
+    """O quadro pronto: a forma `avatar` (Definicao) no `estado` (nome ou Animacao) no instante `t`, em RGBA.
+    Sem `cor`, a sugerida para a forma (as que vêm com a biblioteca têm a sua)."""
     anim = _animacao(estado, biblioteca)
-    return desenhar(forma_de(avatar), anim.parametros(t), anim, t, _cor(cor), 1.0, estilo)
+    return desenhar(forma_de(avatar), anim.parametros(t), anim, t, _cor(cor, avatar), 1.0, estilo)

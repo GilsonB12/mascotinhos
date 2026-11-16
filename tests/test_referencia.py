@@ -67,6 +67,17 @@ def quadros():
                 h = hashlib.sha256(f"{img.mode}{img.size}".encode())
                 h.update(img.tobytes())
                 yield f"volume/{aid}/{est}/{t}", h.hexdigest()[:16]
+    # em estilo terminal: o pacote terminal nas três tintas
+    bib = oa.Biblioteca.carregar(pacote="terminal")
+    for tinta in ("ascii", "blocos", "contorno"):
+        estilo = oa.Estilo(terminal=oa.Terminal(tinta=tinta))
+        for aid, d in oa.exemplos().items():
+            for est in bib.estados():
+                for t in (0.0, 0.6, 1.37, 2.71):
+                    img = oa.quadro(d, est, t, CORES.get(aid, "#E07A57"), estilo=estilo, biblioteca=bib)
+                    h = hashlib.sha256(f"{img.mode}{img.size}".encode())
+                    h.update(img.tobytes())
+                    yield f"terminal-{tinta}/{aid}/{est}/{t}", h.hexdigest()[:16]
 
 
 def gerar() -> None:

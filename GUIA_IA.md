@@ -83,7 +83,12 @@ trilha com `ciclo` ~4 s e uma fase curta (`dur` 0,14) com `pisca: 1`; tremer = `
 `segue_pulo`), `gotas` (`n`, `periodo`, `cai`), `bateria` (`modo` `enchendo` ou `baixa`, `ciclo`, `de`, `ate`,
 `periodo`, `segue_pulo`), `faiscas` (`n`, `ciclo`, `de`, `dur`, `partida`, `raio`, `abertura`, `cor`), `visto`
 (`desenha`, `atraso`, `periodo`, `cor`, `segue_pulo`). `cor`: `corpo`, `texto`, `verde`, `ambar`, `azul`, `gota`,
-`vermelho`. Os extras com lugar aceitam `prof` (profundidade no 3D: > 0 na frente do corpo, < 0 atrás). Nenhum
+`vermelho`. De terminal (texto; `ancora` também `rodape` e `cabecalho`, a última e a primeira linha; `alinha`):
+`prompt` (`texto`, `digita`, `ciclo`, `cursor`, `pisca`), `spinner` (`figura` `barras`/`braille`/`pontos`, `periodo`),
+`barra` (`modo` `fixo`/`enchendo`/`esvaziando`, `valor`, `largura`, `ciclo`, `de`, `ate`, `cheio`, `vazio`, `pct`,
+`treme`), `rotulo` (`texto`, `aparece`, `some`, `pisca`, `ciclo`, `inverso`, `segue_pulo`). `{v}` no texto vira o
+`valor` (ou o que o app passar com o nome de `dado`). Texto: até 40 letras, só ASCII, acentos do português e
+`█▓▒░`. Os extras com lugar aceitam `prof` (profundidade no 3D: > 0 na frente do corpo, < 0 atrás). Nenhum
 outro tipo existe: não invente.
 
 ## Regras
@@ -93,6 +98,9 @@ outro tipo existe: não invente.
 - Ritmo legível numa tela que redesenha a cada 0,2 s: cada pose-chave dura 0,4 s ou mais; o que se repete tem período
   de 0,9 s ou mais e nunca múltiplo exato de 0,2 s (use 0,7 / 0,9 / 1,1 / 1,3). Confira com
   `tira FORMA ESTADO --segundos 4 --quadros 20` (um quadro a cada 0,2 s).
+- Estilo terminal (`docs/terminal.md`): veja com `--estilo terminal` (ou `--pacote terminal`). A grade tem 26x21
+  células: o corpo ocupa da linha 7 à 18; as linhas 0 a 5 e as duas últimas são dos textos. Um texto por linha, com
+  até 26 letras; destaque é `inverso` e `pisca`, não cor.
 - 3D com parcimônia (`docs/3d.md`): um giro de olhar dura 0,4 s ou mais e não passa de ±35; uma volta inteira leva
   1,2 s ou mais; `zoom` só em momentos de destaque (um pulo). O estado precisa ser entendido também sem volume.
 - Estados calmos (ocioso, concluído) ficam calmos depois do começo: movimentos pequenos e lentos.

@@ -1,0 +1,85 @@
+# Publica no PyPI e no npm quando sai uma Release no GitHub. Não faz nada até ser configurado (ver PUBLICAR.md):
+#   - PyPI: publicação confiável (sem token) + a variável do repositório PUBLICAR_PYPI = sim;
+#   - npm: publicação confiável ou o segredo NPM_TOKEN + a variável PUBLICAR_NPM = sim.
+name: publicar
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  conferir:
+    name: a tag bate com as versões
+    if: vars.PUBLICAR_PYPI == 'sim' || vars.PUBLICAR_NPM == 'sim'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: tag vX.Y.Z = pyproject = __version__ = js/package.json
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          versao="${TAG#v}"
+          py=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          init=$(python3 -c "import re; print(re.search(r'__version__ = \"([^\"]+)\"', open('mascotinhos/__init__.py', encoding='utf-8').read()).group(1))")
+          js=$(node -p "require('./js/package.json').version")
+          echo "tag $versao | pyproject $py | __version__ $init | js $js"
+          test "$versao" = "$py" && test "$versao" = "$init" && test "$versao" = "$js"
+
+  pypi:
+    name: PyPI
+    needs: conferir
+    if: vars.PUBLICAR_PYPI == 'sim'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/mascotinhos
+    permissions:
+      contents: read
+      id-token: write # a publicação confiável do PyPI (sem senha nem token)
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: testes
+        run: |
+          python -m pip install .
+          python -m unittest discover -s tests
+      - name: monta o sdist e o wheel
+        run: |
+          python -m pip install build
+          python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  npm:
+    name: npm
+    needs: conferir
+    if: vars.PUBLICAR_NPM == 'sim'
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/mascotinhos
+    permissions:
+      contents: read
+      id-token: write # publicação confiável do npm e a procedência (provenance)
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: testes
+        run: node --test
+      - name: a licença vai junto no pacote
+        run: cp ../LICENSE LICENSE
+      - name: publica (com procedência)
+        run: npm publish --provenance --access public
+        env:
+          # vazio com a publicação confiável configurada no npmjs.com; com o segredo, usa o token
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

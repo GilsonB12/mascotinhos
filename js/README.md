@@ -31,7 +31,24 @@ navegador, tudo entra nas opções de `montar(el, {...})` (e muda depois com `m.
 | <img src="../docs/exemplos/dados-ao-vivo.png" width="120" alt="Limite 37%"> | **Números de verdade** nos textos do terminal | `{ dados: { limite: 37 } }` |
 | <img src="../docs/exemplos/fps-5.gif" width="120" alt="5 quadros por segundo"> | **Quadros por segundo** (5 = como a telinha) | `{ fps: 5 }` |
 | <img src="../docs/exemplos/mascote-orbita.png" width="120" alt="Órbita"> | **O mascote**: um dos doze ids (`bolota`, `broto`, `fantasma`, `ombro-cloud`, `sereno`, `orbita`, `cubo`, `scout`, `pixel`, `chevron`, `maestro`, `nova`) ou o JSON de uma forma | `{ forma: "orbita" }` |
-| <img src="../docs/exemplos/cor-propria.png" width="120" alt="Cor escolhida"> | **A cor** (o padrão é sempre `#E07A57`: passe a de cada mascote) | `{ cor: "#8E7CFF" }` |
+| <img src="../docs/exemplos/cor-propria.png" width="120" alt="Cor escolhida"> | **A cor** (sem `cor`, a sugerida do mascote; `#E07A57` para um JSON seu) | `{ cor: "#8E7CFF" }` |
+
+## Criar um mascote
+
+Uma **receita** do gerador vale no lugar da forma, e dá o mesmo mascote que o Python (guia com imagens no
+[README principal](../README.md#crie-o-seu-mascote); cada parâmetro em [docs/gerador.md](../docs/gerador.md)):
+
+```js
+import { montar, gerar, receitaAleatoria, aleatorios, parametrosDa, corDaReceita } from "mascotinhos";
+
+montar(el, { forma: { familia: "estrela", pontas: 6, semente: 7, cor: "#E58FB0" }, estado: "esperando", pacote: "vivo" });
+const forma = gerar({ familia: "nuvem", gomos: 4 });   // o JSON do contrato v1, já conferido
+const receita = receitaAleatoria(42);                  // a mesma para a mesma semente; aleatorios(12) dá doze diferentes
+parametrosDa("estrela");                               // { pontas: { min: 4, max: 8, padrao: 5, inteiro: true }, ... }
+```
+
+Na demonstração, o painel **Criar mascote** faz isso com controles: família, um controle por parâmetro, semente, cor,
+o mascote ao vivo no estilo escolhido na página e o botão **copiar JSON** (a receita ou a forma pronta).
 
 ## O que tem aqui
 
@@ -48,14 +65,16 @@ navegador, tudo entra nas opções de `montar(el, {...})` (e muda depois com `m.
 | `src/volume.js` | O 3D: giro, câmera, profundidade dos extras, a luz e as cores do volume (`volume.py`) |
 | `src/desenho.js` | Corpo, olhos (os cinco estilos) e extras numa pose, chapado ou 3D (`desenho.py`) |
 | `src/svg.js` | O pintor SVG e o `quadroSvg` (`svg.py`) |
+| `src/gerador.js` | O gerador de mascotes: da receita (família, parâmetros, semente) à forma, com as mesmas contas do `gerador.py` |
 | `src/animador.js` | O `Animador`: mistura de estados, troca de forma, realce da cor (`animador.py`) |
 | `src/runtime.js` | `montar`: o mascote vivo na página |
 | `dados/` | **Gerado**: cópia dos pacotes `classico`, `vivo`, `3d`, `terminal`, das formas de exemplo e da fonte de pontos (`fonte_bitmap.json`), e `embutidos.js` com tudo isso como módulo |
 | `scripts/sincronizar.mjs` | Copia os JSON do pacote Python para `dados/` e pede ao Python a tabela da fonte (`--conferir` só confere) |
 | `scripts/referencia.py` | Gera `tests/referencia.json` com o próprio pacote Python |
+| `scripts/referencia_gerador.py` | Gera `tests/referencia_gerador.json`: o que o gerador do Python devolve para mais de quatrocentas receitas |
 | `scripts/previas.py` | A folha do Python e a do JavaScript lado a lado, retratadas no Chrome sem janela |
-| `tests/` | `node --test`: paridade, SVG, runtime (com um DOM falso) e sincronia |
-| `demo/` | `index.html` (galeria, palco, colar JSON) e `folha.html` (a folha do Python, desenhada aqui) |
+| `tests/` | `node --test`: paridade, SVG, runtime (com um DOM falso), sincronia e o gerador (a mesma receita, a mesma forma do Python) |
+| `demo/` | `index.html` (o painel Criar mascote, a galeria, o palco, colar JSON) e `folha.html` (a folha do Python, desenhada aqui) |
 
 O Python continua sendo a fonte única dos JSON e da fonte: mudou uma animação em `mascotinhos/animacoes*/` ou um
 desenho em `fonte_bitmap.py`? Rode `node scripts/sincronizar.mjs` (o teste `sincronia` falha até isso).
@@ -87,11 +106,11 @@ const svg = quadroSvg("bolota", "esperando", 0.4);   // texto; funciona no Node 
 
 | Opção | Padrão | O que faz |
 | --- | --- | --- |
-| `forma` | `"bolota"` | id de exemplo, JSON (contrato v1), `Definicao` ou `Forma` |
+| `forma` | `"bolota"` | id de exemplo, JSON (contrato v1), `Definicao`, `Forma` ou uma receita do gerador (`{ familia: "estrela", pontas: 6 }`) |
 | `estado` | `"ocioso"` | o estado inicial |
 | `animacao` | | uma animação de fora (JSON): entra na biblioteca e vira o estado inicial |
 | `pacote` / `biblioteca` | `"classico"` | os estados embutidos, ou uma `Biblioteca` pronta |
-| `cor` | `"#E07A57"` | a cor do corpo |
+| `cor` | a do mascote | a cor do corpo; sem ela, a sugerida da forma que vem junto ou a da receita (e acompanha o `usarForma`); para um JSON seu, `"#E07A57"` |
 | `volume` | só no pacote `3d` | luz, relevo, chão e sombra (em gradientes) |
 | `tamanho` | | largura em px CSS (a altura segue a proporção); sem ele, `width/height="100%"` |
 | `fps` | do navegador | limite de quadros por segundo (5 = como a telinha) |

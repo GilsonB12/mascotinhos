@@ -10,6 +10,7 @@
  "ambientes": [
   {
    "plataforma": "win32",
+   "python": "3.14",
    "pillow": "12.2.0",
    "freetype": "2.14.3",
    "quadros": {

@@ -236,3 +236,20 @@ test("sem DOM com requestAnimationFrame (Node puro), montar ainda desenha uma ve
   assert.ok(cena(m).childNodes.length > 3);
   assert.throws(() => montar(null), /passe um elemento/);
 });
+
+test("sem `cor`, o mascote usa a cor dele: a sugerida da forma (ou a da receita) e ela acompanha a troca de forma", (t) => {
+  const amb = ambiente(t, { reduzir: true });
+  const m = montar(amb.doc.createElement("div"), { forma: "broto" });
+  t.after(() => m.destruir());
+  assert.deepEqual([...m.animador.corBase], [127, 183, 126]);
+  m.usarForma("fantasma", undefined, { ja: true });
+  assert.deepEqual([...m.animador.corBase], [111, 168, 220]);
+  m.usarForma({ familia: "gota", cor: "#00FF00" }, undefined, { ja: true }); // uma receita do gerador serve de forma
+  assert.deepEqual([...m.animador.corBase], [0, 255, 0]);
+  m.ajustar({ cor: "#112233" }); // escolheu a cor: ela fica
+  m.usarForma("broto", undefined, { ja: true });
+  assert.deepEqual([...m.animador.corBase], [17, 34, 51]);
+  const fixa = montar(amb.doc.createElement("div"), { forma: "broto", cor: "#445566" });
+  t.after(() => fixa.destruir());
+  assert.deepEqual([...fixa.animador.corBase], [68, 85, 102]);
+});

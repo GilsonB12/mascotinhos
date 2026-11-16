@@ -61,6 +61,9 @@ export function esperado() {
     arquivos[`${PASTA_FORMAS}/${arq}`] = texto;
     formas[arq.slice(0, -5)] = JSON.parse(texto);
   }
+  // as cores sugeridas das formas (o _cores.json não é forma, mas vai junto: é a cor de quem não escolheu cor)
+  const cores = join(ORIGEM, PASTA_FORMAS, "_cores.json");
+  if (existsSync(cores)) formas._cores = JSON.parse(readFileSync(cores, "utf8"));
   const linhas = (obj) => Object.entries(obj).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},`).join("\n");
   const pacotesJs = Object.entries(pacotes).map(([nome, estados]) => `  ${JSON.stringify(nome)}: {\n${linhas(estados).replace(/^ {2}/gm, "    ")}\n  },`).join("\n");
   const f = fonte();

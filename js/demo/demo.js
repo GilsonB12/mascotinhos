@@ -1,6 +1,11 @@
 // A página de demonstração: a galeria de formas × estados, o palco com troca de estado e de forma, e uma caixa para
-// colar o JSON de uma forma ou de uma animação. Tudo com a API pública do pacote.
-import { bibliotecaDoPacote, exemplos, lerAnimacao, lerDefinicao, montar, pacotes, tipoDeArquivo, validarAnimacao, validarDefinicao } from "../index.js";
+// colar o JSON de uma forma, de uma animação ou de uma receita do gerador, e o painel "Criar mascote" (criar.js). Tudo
+// com a API pública do pacote.
+import {
+  ReceitaInvalida, bibliotecaDoPacote, corDaReceita, coresSugeridas, exemplos, gerar, lerAnimacao, lerDefinicao, montar, pacotes, tipoDeArquivo,
+  validarAnimacao, validarDefinicao,
+} from "../index.js";
+import { montarCriador } from "./criar.js";
 
 const CORES = ["#E07A57", "#7FB77E", "#6FA8DC", "#E8B04B", "#C58AD8", "#6FA3A0", "#E58FB0"];
 const NOMES_PACOTE = { classico: "clássico", vivo: "vivo", "3d": "3d", terminal: "terminal" };
@@ -30,7 +35,8 @@ let palco = null;
 let formaDoPalco = "bolota";
 
 const $ = (sel) => document.querySelector(sel);
-const corDa = (i) => (estado.corPorForma ? CORES[i % CORES.length] : estado.cor);
+const SUGERIDAS = coresSugeridas(); // as cores do _cores.json das formas que vêm com a biblioteca
+const corDa = (i) => (estado.corPorForma ? SUGERIDAS[estado.formas[i]?.id] || CORES[i % CORES.length] : estado.cor);
 
 function marcar(grupo, valor) {
   for (const b of grupo.querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.v === String(valor)));
@@ -242,6 +248,16 @@ function mensagens(lista) {
   }
 }
 
+/** Põe uma forma nova (colada ou criada) no palco e na galeria. */
+function adotar(def, cor) {
+  if (cor) SUGERIDAS[def.id] = cor;
+  estado.formas = estado.formas.filter((d) => d.id !== def.id).concat(def);
+  formaDoPalco = def.id;
+  palco.usarForma(def, corDoPalco());
+  montarBotoesForma();
+  montarGaleria();
+}
+
 function aplicar(texto) {
   let dados;
   try {
@@ -250,16 +266,23 @@ function aplicar(texto) {
     mensagens([["erro", `JSON inválido: ${e.message}`]]);
     return;
   }
-  const tipo = tipoDeArquivo(dados);
+  let tipo = tipoDeArquivo(dados);
+  let corDaForma = null;
+  if (tipo === "receita") { // uma receita do gerador vira a forma dela
+    try {
+      corDaForma = corDaReceita(dados);
+      dados = gerar(dados);
+      tipo = "forma";
+    } catch (e) {
+      if (!(e instanceof ReceitaInvalida)) throw e;
+      return mensagens([["erro", `receita: ${e.message}`]]);
+    }
+  }
   if (tipo === "forma") {
     const { erros, avisos } = validarDefinicao(dados);
     if (erros.length) return mensagens(erros.map((m) => ["erro", m]));
     const def = lerDefinicao(dados);
-    estado.formas = estado.formas.filter((d) => d.id !== def.id).concat(def);
-    formaDoPalco = def.id;
-    palco.usarForma(def, corDoPalco());
-    montarBotoesForma();
-    montarGaleria();
+    adotar(def, corDaForma);
     mensagens([...avisos.map((m) => ["aviso", m]), ["ok", `forma "${def.nome}" no palco e na galeria`]]);
   } else if (tipo === "animação") {
     const { erros, avisos } = validarAnimacao(dados);
@@ -269,7 +292,7 @@ function aplicar(texto) {
     montarBotoesEstado();
     mensagens([...avisos.map((m) => ["aviso", m]), ["ok", `estado "${anim.estado}" tocando no palco`]]);
   } else {
-    mensagens([["erro", 'não sei o que é este JSON: uma forma tem version, id, name, body e eyes; uma animação tem "formato": "mascotinhos/animacao"']]);
+    mensagens([["erro", 'não sei o que é este JSON: uma forma tem version, id, name, body e eyes; uma animação tem "formato": "mascotinhos/animacao"; uma receita do gerador tem "familia"']]);
   }
 }
 
@@ -303,3 +326,14 @@ montarControles();
 montarGaleria();
 montarPalco();
 montarEntrada();
+
+// o painel "Criar mascote": as prévias dele seguem o pacote, o estilo e os quadros por segundo da página
+const criador = montarCriador($("#criar"), {
+  opcoes: () => ({ pacote: estado.pacote, fps: estado.fps, ...opcoesDeEstilo() }),
+  usar: (definicao, cor) => {
+    adotar(lerDefinicao(definicao), cor);
+    mensagens([["ok", `"${definicao.name}" no palco e na galeria`]]);
+    $("#t-palco").scrollIntoView({ behavior: "smooth", block: "start" });
+  },
+});
+for (const tipo of ["click", "input"]) $("#controles").addEventListener(tipo, () => criador.ajustar());

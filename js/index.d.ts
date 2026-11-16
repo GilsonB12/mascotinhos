@@ -42,7 +42,7 @@ export class Forma {
 }
 
 /** Forma aceita pelas funções de cima: id de exemplo ("bolota", "broto", "fantasma"), JSON, Definicao ou Forma. */
-export type QualquerForma = string | DadosForma | Definicao | Forma;
+export type QualquerForma = string | DadosForma | Definicao | Forma | Receita;
 
 export interface Conferencia {
   erros: string[];
@@ -59,6 +59,51 @@ export function aumentoOlhos(polys: Ponto[][], olhos: { x: number; y: number; sp
 export function corHex(cor: Cor): RGB;
 export function formaDe(forma: DadosForma | Definicao | Forma): Forma;
 export function resolverForma(forma: QualquerForma): Forma;
+/** A cor própria da forma ("#RRGGBB"): a da receita, ou a sugerida de uma forma que vem com a biblioteca; null sem. */
+export function corPropria(forma: QualquerForma): string | null;
+
+// ---------- o gerador de mascotes ----------
+export type Familia = "bolha" | "nuvem" | "planeta" | "estrela" | "engrenagem" | "gota" | "escudo" | "fantasma" | "bloco" | "broto";
+export type Enfeite = "nenhum" | "orelhas" | "antena" | "rabo";
+/** A receita de um mascote: a família, os parâmetros dela (ver docs/gerador.md) e, se quiser, semente, cor, enfeite... */
+export interface Receita {
+  familia: Familia;
+  /** A variação: a mesma semente dá sempre o mesmo mascote (inteiro de 0 a 4294967295; padrão 0). */
+  semente?: number;
+  cor?: string;
+  id?: string;
+  nome?: string;
+  enfeite?: Enfeite;
+  /** Sem isso, os olhos vão sozinhos para o maior espaço livre do rosto. */
+  olhos?: { x: number; y: number; spacing: number; scale: number };
+  [parametro: string]: unknown;
+}
+export interface ParametroDaFamilia {
+  min?: number;
+  max?: number;
+  inteiro?: boolean;
+  opcoes?: string[];
+  padrao: number | string;
+}
+export class ReceitaInvalida extends Error {}
+export const FAMILIAS: Readonly<Record<Familia, readonly [Function, Record<string, readonly (number | string)[]>]>>;
+export const ENFEITES: readonly Enfeite[];
+export const CORES_DO_GERADOR: readonly string[];
+/** A forma (contrato v1) do mascote da receita, já conferida; ReceitaInvalida se a receita não serve. */
+export function gerar(receita: Receita): DadosForma;
+/** A receita completa (com os padrões da família), ou ReceitaInvalida dizendo o que há. */
+export function conferirReceita(receita: unknown): Receita;
+export function corDaReceita(receita: Receita): string;
+export function ehReceita(dados: unknown): dados is Receita;
+/** Uma receita sorteada: a mesma para a mesma semente (e a mesma do Python). */
+export function receitaAleatoria(semente: number, familia?: Familia): Receita;
+/** `quantos` receitas sorteadas, válidas e diferentes entre si. */
+export function aleatorios(quantos: number, semente?: number, familia?: Familia): Receita[];
+/** Os parâmetros de uma família, para montar controles. */
+export function parametrosDa(familia: Familia): Record<string, ParametroDaFamilia>;
+export function olhosPara(polys: Ponto[][]): { x: number; y: number; spacing: number; scale: number } | null;
+/** O sorteio do gerador (mulberry32): números de 0 a 1 que só dependem da semente. */
+export function sorteio(semente: number): () => number;
 /** As formas de exemplo (bolota, broto, fantasma). */
 export function exemplos(): Record<string, Definicao>;
 
@@ -132,7 +177,7 @@ export class Biblioteca {
 /** "classico", "3d", "vivo". */
 export function pacotes(): string[];
 export function bibliotecaDoPacote(pacote?: NomePacote): Biblioteca;
-export function tipoDeArquivo(dados: unknown): "forma" | "animação" | null;
+export function tipoDeArquivo(dados: unknown): "forma" | "animação" | "receita" | null;
 
 export const CAMPOS: readonly string[];
 export const NEUTRO: Readonly<Pose>;

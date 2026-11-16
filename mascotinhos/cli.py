@@ -5,9 +5,11 @@
   tira <forma> <estado>                   PNG com quadros seguidos de um estado (para ver o movimento numa imagem)
   gif <forma> <estado>                    GIF animado de um estado
   svg <forma> <estado> --t T              o quadro do instante T em SVG
-  validar <arquivo.json> [...]            confere formas e animações (erros e avisos, em português)
+  gerar <familia> [--parametro V ...]     cria a forma de um mascote novo (gerar --aleatorio N --pasta P sorteia vários)
+  validar <arquivo.json> [...]            confere formas, animações e receitas (erros e avisos, em português)
 
-<forma> é o id de uma forma da pasta (--formas; sem ela, as de exemplo) ou o caminho de um .json; <estado> é o nome
+<forma> é o id de uma forma da pasta (--formas; sem ela, as de exemplo) ou o caminho de um .json (uma forma ou uma
+receita do gerador, como {"familia": "estrela", "pontas": 6}); <estado> é o nome
 de um estado (os que vêm com a biblioteca e os de --animacoes) ou o caminho de um .json. --pacote vivo troca os seis
 estados de sempre pelos do pacote "vivo"; --pacote 3d, pelos que giram e têm câmera (e liga o volume: luz, relevo,
 chão e sombra); --pacote terminal, pelos de terminal (prompt, barra de progresso, [ OK ]), em caracteres.
@@ -27,7 +29,9 @@ from PIL import Image, ImageDraw
 
 from .animacao import AnimacaoInvalida, Biblioteca, carregar_animacao, pacotes, validar_animacao
 from .desenho import Estilo, Terminal, Volume, desenhar, fonte_padrao, forma_de
-from .formas import COR, DefinicaoInvalida, carregar_definicao, carregar_pasta, cor_hex, cores_da_pasta, validar_definicao
+from . import gerador
+from .formas import (COR, ID, DefinicaoInvalida, carregar_definicao, carregar_pasta, cor_hex, cores_da_pasta, ler_definicao,
+                     validar_definicao)
 from .palco import Enquadramento
 from .svg import desenhar_svg
 from .terminal import TINTAS
@@ -47,8 +51,30 @@ def _formas(args) -> dict:
     return carregar_pasta(args.formas) if args.formas else carregar_pasta()
 
 
+RECEITAS: dict = {}  # id -> cor, das formas que vieram de uma receita nesta chamada
+
+
+def _de_receita(receita, ident: Optional[str] = None):
+    """A forma de uma receita do gerador (e a cor dela fica guardada para _cor)."""
+    try:
+        if ident and "id" not in receita:
+            receita = dict(receita, id=ident)
+        defn = ler_definicao(gerador.gerar(receita))
+        RECEITAS[defn.id] = gerador.cor_da_receita(receita)
+    except gerador.ReceitaInvalida as e:
+        raise ErroDeUso(f"receita: {e}") from None
+    return defn
+
+
 def _forma(args, nome: str):
     if nome.endswith(".json") or Path(nome).is_file():
+        try:
+            dados = json.loads(Path(nome).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            dados = None  # carregar_definicao explica o que há
+        if gerador.eh_receita(dados):  # uma receita do gerador serve no lugar de uma forma
+            ident = Path(nome).stem.lower()
+            return _de_receita(dados, ident if ID.fullmatch(ident) else None)
         return carregar_definicao(nome)
     formas = _formas(args)
     if nome not in formas:
@@ -74,6 +100,8 @@ def _cor(args, defn, formas: Optional[dict] = None):
         if not COR.fullmatch(args.cor):
             raise ErroDeUso(f"--cor: use #RRGGBB, veio {args.cor!r}")
         return cor_hex(args.cor)
+    if defn.id in RECEITAS:
+        return cor_hex(RECEITAS[defn.id])
     try:
         sugeridas = cores_da_pasta(args.formas)
     except DefinicaoInvalida:
@@ -153,7 +181,14 @@ def listar(args) -> int:
 
 
 def folha(args) -> int:
-    formas, bib = _formas(args), _biblioteca(args)
+    if args.arquivos:  # formas ou receitas passadas direto, no lugar da pasta
+        formas = {}
+        for nome in args.arquivos:
+            d = _forma(args, nome)
+            formas[d.id] = d
+    else:
+        formas = _formas(args)
+    bib = _biblioteca(args)
     todas = formas
     if args.so:
         ids = [x.strip() for x in args.so.split(",") if x.strip()]
@@ -238,6 +273,8 @@ def svg(args) -> int:
 def _tipo(dados) -> Optional[str]:
     if isinstance(dados, dict) and "formato" in dados:
         return "animação"
+    if gerador.eh_receita(dados):
+        return "receita"
     if isinstance(dados, dict) and ({"body", "eyes"} & set(dados) or {"version", "id"} <= set(dados)):
         return "forma"
     return None
@@ -262,6 +299,12 @@ def validar(args) -> int:
             erros, avisos = validar_definicao(dados, esperado=arq.stem)
         elif tipo == "animação":
             erros, avisos = validar_animacao(dados, esperado=arq.stem)
+        elif tipo == "receita":
+            try:
+                gerador.gerar(dados)
+                erros, avisos = [], []
+            except gerador.ReceitaInvalida as e:
+                erros, avisos = [str(e)], []
         else:
             erros, avisos = ["não sei o que é este arquivo: uma forma tem version, id, name, body e eyes; uma animação "
                              "tem \"formato\": \"mascotinhos/animacao\""], []
@@ -274,6 +317,78 @@ def validar(args) -> int:
         else:
             print(f"ok    {arq} ({tipo}{', com avisos' if avisos else ''})")
     return 1 if ruins else 0
+
+
+def _numero(v: str):
+    try:
+        return int(v)
+    except ValueError:
+        try:
+            return float(v.replace(",", "."))
+        except ValueError:
+            return v
+
+
+def _gravar_json(destino: Path, dados) -> None:
+    destino.write_text(json.dumps(dados, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def gerar(args) -> int:
+    if args.aleatorio:
+        if args.familia and args.familia not in gerador.FAMILIAS:
+            raise ErroDeUso(f"familia desconhecida: {args.familia!r} (há: {', '.join(gerador.FAMILIAS)})")
+        pasta = Path(args.pasta or "mascotes").resolve()
+        _saida(args_com(args, str(pasta / "x.json")), "x.json")
+        semente = args.semente if args.semente is not None else 1
+        receitas = gerador.aleatorios(args.aleatorio, semente, args.familia)
+        cores = {}
+        for r in receitas:
+            d = gerador.gerar(r)
+            _gravar_json(pasta / f"{d['id']}.json", d)
+            cores[d["id"]] = r["cor"]
+        _gravar_json(pasta / "_cores.json", cores)
+        _gravar_json(pasta / "_receitas.json", receitas)
+        print(f"{len(receitas)} mascotes sorteados (a partir da semente {semente}) em {pasta}")
+        print(f"  para ver: python -m mascotinhos folha --formas {args.pasta or 'mascotes'} --pacote vivo")
+        return 0
+    if args.de:
+        try:
+            receita = json.loads(Path(args.de).read_text(encoding="utf-8"))
+        except ValueError as e:
+            raise ErroDeUso(f"{args.de}: JSON inválido ({e})") from None
+        if not gerador.eh_receita(receita):
+            raise ErroDeUso(f"{args.de}: não é uma receita (falta \"familia\")")
+    elif args.familia:
+        receita = {"familia": args.familia}
+    else:
+        raise ErroDeUso(f"diga a família ({', '.join(gerador.FAMILIAS)}), ou --de receita.json, ou --aleatorio N")
+    for nome in gerador.PARAMETROS + ("enfeite", "cor", "id", "nome"):
+        v = getattr(args, "p_" + nome, None)
+        if v is not None:
+            receita[nome] = v if nome in ("cor", "id", "nome", "enfeite") else _numero(v)
+    if args.semente is not None:
+        receita["semente"] = args.semente
+    destino = _saida(args, f"{receita.get('id') or receita['familia']}.json")
+    if "id" not in receita and ID.fullmatch(destino.stem):
+        receita["id"] = destino.stem  # o id é o nome do arquivo, como o contrato pede
+    try:
+        d = gerador.gerar(receita)
+        completa = gerador.conferir_receita(receita)
+    except gerador.ReceitaInvalida as e:
+        raise ErroDeUso(str(e)) from None
+    _gravar_json(destino, d)
+    print(f"{d['id']} ({completa['familia']}, cor {completa['cor']}): {destino}")
+    if args.receita:
+        arq = Path(args.receita).resolve()
+        _saida(args_com(args, str(arq)), "x.json")
+        _gravar_json(arq, {k: v for k, v in completa.items() if k != "olhos" or "olhos" in receita})
+        print(f"a receita: {arq}")
+    return 0
+
+
+def args_com(args, saida: str):
+    """Os mesmos argumentos com outra saída (para conferir e criar a pasta de um segundo arquivo)."""
+    return argparse.Namespace(**dict(vars(args), saida=saida))
 
 
 # ---------- argumentos ----------
@@ -318,6 +433,8 @@ def montar_parser() -> argparse.ArgumentParser:
     p.set_defaults(fn=listar, cor=None)
 
     p = sub.add_parser("folha", help="PNG com todas as formas em todos os estados")
+    p.add_argument("arquivos", nargs="*", metavar="arquivo.json",
+                   help="formas ou receitas do gerador para pôr na folha (sem isso, as da pasta de --formas)")
     _comuns(p)
     p.add_argument("--so", metavar="ID,ID", help="só estas formas")
     p.add_argument("--estados", metavar="A,B", help="só estes estados (nomes ou caminhos de .json)")
@@ -351,7 +468,26 @@ def montar_parser() -> argparse.ArgumentParser:
     p.add_argument("--escala", type=_positivo(int), default=1)
     p.set_defaults(fn=svg)
 
-    p = sub.add_parser("validar", help="confere arquivos de forma e de animação")
+    p = sub.add_parser("gerar", help="cria um mascote novo a partir de uma família e de parâmetros",
+                       allow_abbrev=False, description="Cria a forma (JSON do contrato v1) de um mascote novo. "
+                       "Famílias: " + ", ".join(gerador.FAMILIAS) + ". Os parâmetros de cada uma estão em docs/gerador.md.")
+    p.add_argument("familia", nargs="?", help="a família: " + ", ".join(gerador.FAMILIAS))
+    for nome in gerador.PARAMETROS:
+        p.add_argument("--" + nome, dest="p_" + nome, metavar="V", help="parâmetro de " + ", ".join(
+            f for f, (_, esq) in gerador.FAMILIAS.items() if nome in esq))
+    p.add_argument("--enfeite", dest="p_enfeite", choices=gerador.ENFEITES, help="orelhas, antena ou rabo por cima da forma")
+    p.add_argument("--semente", type=int, help="a variação: a mesma semente dá sempre o mesmo mascote")
+    p.add_argument("--cor", dest="p_cor", metavar="#RRGGBB", help="a cor sugerida (padrão: uma pela semente)")
+    p.add_argument("--id", dest="p_id", metavar="ID", help="o id da forma (padrão: o nome do arquivo de saída)")
+    p.add_argument("--nome", dest="p_nome", metavar="NOME", help="o nome da forma")
+    p.add_argument("--de", metavar="RECEITA.json", help="parte de uma receita gravada")
+    p.add_argument("--aleatorio", type=_positivo(int), metavar="N", help="sorteia N mascotes diferentes (use com --pasta)")
+    p.add_argument("--pasta", metavar="PASTA", help="com --aleatorio: onde gravar (padrão: mascotes/)")
+    p.add_argument("--receita", metavar="ARQUIVO", help="grava também a receita completa neste arquivo")
+    p.add_argument("-o", "--saida", metavar="ARQUIVO", help="onde gravar a forma (padrão: <familia>.json na pasta atual)")
+    p.set_defaults(fn=gerar)
+
+    p = sub.add_parser("validar", help="confere arquivos de forma, de animação e receitas do gerador")
     p.add_argument("arquivos", nargs="+", metavar="arquivo.json")
     p.set_defaults(fn=validar)
     return ap

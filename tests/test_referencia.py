@@ -5,7 +5,7 @@ querer.
     qualquer máquina. São os mesmos números do mascote antes de virar biblioteca (o Ombro Screen guarda as mesmas
     referências no tests/golden/ dele);
   - o hash dos pixels das formas de exemplo em todos os estados: só vale na mesma plataforma e com as mesmas versões
-    de Pillow e FreeType; em outro ambiente o teste é pulado.
+    de Python, Pillow e FreeType; em outro ambiente o teste é pulado.
 
   python tests/test_referencia.py --gerar     refaz as referências deste ambiente (só quando a mudança é de propósito)
 """
@@ -34,7 +34,9 @@ CORES = {"bolota": "#E07A57", "broto": "#7FB77E", "fantasma": "#6FA8DC"}
 
 
 def ambiente() -> dict:
-    return {"plataforma": sys.platform, "pillow": PIL.__version__, "freetype": features.version("freetype2") or "?"}
+    # os pixels dependem do sistema, do Pillow, do FreeType e (no arredondamento das contas) da versão do Python
+    return {"plataforma": sys.platform, "python": "%d.%d" % sys.version_info[:2], "pillow": PIL.__version__,
+            "freetype": features.version("freetype2") or "?"}
 
 
 def parametros(pacote: str = "classico") -> dict:

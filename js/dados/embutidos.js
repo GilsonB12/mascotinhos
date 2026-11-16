@@ -52,6 +52,7 @@ export const FORMAS = {
   "pixel": {"version":1,"id":"pixel","name":"Pixel","body":{"path":"M30 14H70V22H78V30H86V70H78V78H70V86H30V78H22V70H14V30H22V22H30Z"},"eyes":{"x":50,"y":50,"spacing":18,"scale":1.25}},
   "scout": {"version":1,"id":"scout","name":"Scout","body":{"path":"M50 14C68 14 81 27 81 45C81 58 72 70 58 84C55 87 52 89 50 89C48 89 45 87 42 84C28 70 19 58 19 45C19 27 32 14 50 14Z"},"eyes":{"x":50,"y":45,"spacing":17,"scale":1.2}},
   "sereno": {"version":1,"id":"sereno","name":"Sereno","body":{"path":"M40.5 18.5Q50 13.2 59.5 18.5L74.3 26.8Q83.8 32.1 83.8 42.7L83.8 59.3Q83.8 69.9 74.3 75.2L59.5 83.5Q50 88.8 40.5 83.5L25.7 75.2Q16.2 69.9 16.2 59.3L16.2 42.7Q16.2 32.1 25.7 26.8Z"},"eyes":{"x":50,"y":50,"spacing":18,"scale":1.25}},
+  "_cores": {"bolota":"#E07A57","broto":"#7FB77E","fantasma":"#6FA8DC","ombro-cloud":"#DF8559","sereno":"#D97757","orbita":"#83B596","cubo":"#79A9D8","scout":"#E7AF5E","pixel":"#C58AD8","chevron":"#6FA3A0","maestro":"#E58FB0","nova":"#E7C25E"},
 };
 
 /** @type {{largura: number, altura: number, falta: number[], glifos: Record<string, number[]>}} */

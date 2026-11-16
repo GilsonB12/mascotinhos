@@ -6,7 +6,7 @@ import { Animacao, lerAnimacao } from "./animacao.js";
 import { COR_PADRAO, Animador } from "./animador.js";
 import { estiloDasOpcoes } from "./desenho.js";
 import { NEUTRO } from "./movimento.js";
-import { caixaDoEnquadre, nosDoQuadro, resolverBiblioteca, resolverForma } from "./svg.js";
+import { caixaDoEnquadre, corPropria, nosDoQuadro, resolverBiblioteca, resolverForma } from "./svg.js";
 
 const NS = "http://www.w3.org/2000/svg";
 // as opções que mudam o estilo (o resto do que montar e ajustar aceitam é do mascote)
@@ -165,7 +165,10 @@ class Mascotinho {
     this._opEstilo = { volume: opcoes.volume === undefined ? this._pacote === "3d" : opcoes.volume, pacote: this._pacote };
     for (const k of CHAVES_ESTILO) if (opcoes[k] !== undefined) this._opEstilo[k] = opcoes[k];
     this._estilo = estiloDasOpcoes(this._opEstilo);
-    this.animador = new Animador({ forma: resolverForma(opcoes.forma || "bolota"), corBase: opcoes.cor || COR_PADRAO, estado, inicio: 0, biblioteca });
+    // sem `cor`, a cor própria do mascote (a do _cores.json ou a da receita); e ela acompanha as trocas de forma
+    this._corPropria = !opcoes.cor;
+    const forma0 = opcoes.forma || "bolota";
+    this.animador = new Animador({ forma: resolverForma(forma0), corBase: opcoes.cor || corPropria(forma0) || COR_PADRAO, estado, inicio: 0, biblioteca });
     this._origem = agoraMs();
     this._pausadoEm = null;
     this._pausadoTotal = 0;
@@ -280,13 +283,18 @@ class Mascotinho {
 
   /** Troca a forma (e a cor): encolhe, pisca e troca no meio; `{ja: true}` troca agora. */
   usarForma(forma, cor, { ja = false } = {}) {
+    if (cor !== undefined && cor !== null) this._corPropria = false;
+    else if (this._corPropria) cor = corPropria(forma) || undefined;
     this.animador.usar(resolverForma(forma), cor === undefined ? null : cor, this.relogio(), ja || this._reduzir());
     this._depoisDeMudar();
   }
 
   /** Muda o que não é o estado nem a forma: cor (na hora), volume, fps, pacote, paleta, enquadre, tamanho. */
   ajustar(opcoes = {}) {
-    if (opcoes.cor !== undefined) this.animador.usar(this.animador.forma, opcoes.cor, this.relogio(), true);
+    if (opcoes.cor !== undefined) {
+      this._corPropria = false;
+      this.animador.usar(this.animador.forma, opcoes.cor, this.relogio(), true);
+    }
     if (opcoes.fps !== undefined) {
       this._fps = opcoes.fps > 0 ? opcoes.fps : 0;
       this._ultimo = NaN;

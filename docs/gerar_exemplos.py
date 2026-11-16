@@ -5,6 +5,7 @@
 Todas no mesmo tamanho (156x170, o da telinha): GIFs curtos onde o movimento conta, PNG onde não conta. As
 "receitas" são feitas rodando a linha de comando exatamente como está escrita no README (RECEITAS, abaixo).
 """
+import os
 import sys
 from pathlib import Path
 
@@ -27,19 +28,24 @@ def terminal(**opcoes) -> oa.Estilo:
     return oa.Estilo(terminal=oa.Terminal(**opcoes))
 
 
-def quadro(forma: str, estado: str, t: float, pacote: str, estilo: oa.Estilo, cor=None) -> Image.Image:
-    """Um quadro de 156x170 sobre o fundo escuro, reduzido como a tela faz."""
-    cam = oa.quadro(FORMAS[forma], estado, t, cor, estilo=estilo, biblioteca=BIB[pacote])
+def quadro(forma, estado: str, t: float, pacote: str, estilo: oa.Estilo, cor=None) -> Image.Image:
+    """Um quadro de 156x170 sobre o fundo escuro, reduzido como a tela faz. `forma`: o id de um dos mascotes que vêm
+    junto, ou uma receita do gerador."""
+    if isinstance(forma, dict):
+        forma, cor = oa.ler_definicao(oa.gerar(forma)), cor or oa.cor_da_receita(forma)
+    else:
+        forma = FORMAS[forma]
+    cam = oa.quadro(forma, estado, t, cor, estilo=estilo, biblioteca=BIB[pacote])
     base = Image.new("RGBA", cam.size, FUNDO + (255,))
     base.alpha_composite(cam)
     return base.convert("RGB").resize((156, 170), Image.BOX if estilo.terminal else Image.LANCZOS)
 
 
-def png(nome: str, forma: str, estado: str, t: float, pacote: str = "vivo", estilo: oa.Estilo = CHAPADO, cor=None) -> None:
+def png(nome: str, forma, estado: str, t: float, pacote: str = "vivo", estilo: oa.Estilo = CHAPADO, cor=None) -> None:
     quadro(forma, estado, t, pacote, estilo, cor).save(DESTINO / f"{nome}.png", optimize=True)
 
 
-def gif(nome: str, forma: str, estado: str, segundos: float, pacote: str = "vivo", estilo: oa.Estilo = CHAPADO, fps: float = 12.5,
+def gif(nome: str, forma, estado: str, segundos: float, pacote: str = "vivo", estilo: oa.Estilo = CHAPADO, fps: float = 12.5,
         cores: int = 48) -> None:
     """Um GIF em laço com uma paleta só para todos os quadros (pequeno, e o GitHub anima)."""
     n = max(1, round(segundos * fps))
@@ -61,7 +67,38 @@ RECEITAS = [
     ("receita-4.gif", "gif nova concluido --pacote vivo --volume --cor #FFD23F --escala 1 --segundos 3 --fps 10"),
     ("receita-5.gif", "gif pixel trabalhando --estilo terminal --tinta contorno --fosforo branco --escala 1 --segundos 3 --fps 12"),
     ("receita-6.png", "folha --pacote terminal --so bolota,orbita,cubo --estados ocioso,esperando,reset --t 1"),
+    ("gerador-cometa.gif", "gif exemplos/receitas/cometa.json concluido --pacote vivo --escala 1 --segundos 3 --fps 10"),
 ]
+
+# O gerador (a seção "Crie o seu mascote" do README): a receita de cada imagem, sem a família nem a cor
+CORES_FAMILIA = {"bolha": "#E07A57", "nuvem": "#6FA8DC", "planeta": "#C58AD8", "estrela": "#E58FB0", "engrenagem": "#E8B04B",
+                 "gota": "#5EC4B6", "escudo": "#8E7CFF", "fantasma": "#9BC53D", "bloco": "#F08A5D", "broto": "#7FB77E"}
+PARAMETROS = [  # (arquivo, receita)
+    ("gerador-pontas-4", {"familia": "estrela", "pontas": 4}), ("gerador-pontas-6", {"familia": "estrela", "pontas": 6}),
+    ("gerador-pontas-8", {"familia": "estrela", "pontas": 8}),
+    ("gerador-arredonda-0", {"familia": "estrela", "pontas": 6, "arredonda": 0}),
+    ("gerador-arredonda-05", {"familia": "estrela", "pontas": 6, "arredonda": 0.5}),
+    ("gerador-arredonda-1", {"familia": "estrela", "pontas": 6, "arredonda": 1}),
+    ("gerador-semente-1", {"familia": "nuvem", "gomos": 4, "semente": 1}), ("gerador-semente-2", {"familia": "nuvem", "gomos": 4, "semente": 2}),
+    ("gerador-semente-3", {"familia": "nuvem", "gomos": 4, "semente": 3}),
+    ("gerador-enfeite-orelhas", {"familia": "bloco", "enfeite": "orelhas"}), ("gerador-enfeite-antena", {"familia": "bloco", "enfeite": "antena"}),
+    ("gerador-enfeite-rabo", {"familia": "bloco", "enfeite": "rabo"}),
+    ("gerador-dente-reto", {"familia": "engrenagem", "dente": "reto"}), ("gerador-estilo-degrau", {"familia": "bloco", "estilo": "degrau"}),
+    ("gerador-ponta-cima", {"familia": "gota", "ponta": "cima"}),
+]
+
+
+def gerador() -> None:
+    for familia, cor in CORES_FAMILIA.items():
+        png(f"gerador-{familia}", {"familia": familia, "cor": cor}, "esperando", 1.7)
+    for nome, receita in PARAMETROS:
+        png(nome, dict(receita, cor=CORES_FAMILIA[receita["familia"]]), "esperando", 1.7)
+    # os mesmos sorteados em três visuais
+    sorteados = oa.aleatorios(3, 21)
+    for i, receita in enumerate(sorteados):
+        png(f"gerador-sorteado-{i + 1}", receita, "esperando", 1.7)
+    gif("gerador-volume", sorteados[0], "trabalhando", 2.6, "3d", VOLUME, cores=64)
+    gif("gerador-terminal", sorteados[1], "trabalhando", 2.6, "terminal", terminal(), cores=16)
 
 
 def gerar() -> None:
@@ -101,7 +138,9 @@ def gerar() -> None:
     # o mesmo movimento a 20 e a 5 quadros por segundo
     gif("fps-20", "maestro", "esperando", 2.6, "vivo", fps=20)
     gif("fps-5", "maestro", "esperando", 2.6, "vivo", fps=5)
-    # as receitas: a linha de comando, como no README
+    gerador()
+    # as receitas: a linha de comando, como no README (rodadas na raiz do repositório)
+    os.chdir(RAIZ)
     for arquivo, comando in RECEITAS:
         if cli.main(comando.split() + ["-o", str(DESTINO / arquivo)]):
             sys.exit(f"a receita falhou: {comando}")

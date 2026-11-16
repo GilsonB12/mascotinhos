@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>mascotinhos · player</title>
+<link rel="icon" href="data:,">
 <style>
   :root {
     --fundo: #121110;
@@ -79,6 +80,24 @@
   ul.msgs li.aviso { color: var(--aviso); } ul.msgs li.aviso::before { content: "!"; left: 6px; }
   ul.msgs li.ok { color: var(--ok); } ul.msgs li.ok::before { content: "✓"; }
   footer { color: var(--apagado); font-size: 13px; }
+  .criar-grid { display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .criar-grid { grid-template-columns: 1fr; } }
+  .criar-grid .palco { max-width: 250px; }
+  .minis { display: flex; gap: 6px; margin-top: 8px; max-width: 250px; }
+  .mini { flex: 1; aspect-ratio: 156 / 170; background: #0d0c0b; border: 1px solid var(--borda); border-radius: 8px; }
+  .campo { display: grid; grid-template-columns: 96px minmax(0, 1fr) 5ch; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .campo > span { color: var(--apagado); font-size: 13px; }
+  .campo input[type="range"] { width: 100%; }
+  .campo input[type="number"], select {
+    background: #0d0c0b; color: var(--texto); border: 1px solid var(--borda); border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 14px;
+    width: 100%; min-width: 0;
+  }
+  select:focus-visible, .acoes button:focus-visible { outline: 2px solid var(--destaque); outline-offset: 2px; }
+  pre.json {
+    margin: 0; max-height: 236px; overflow: auto; background: #0d0c0b; border: 1px solid var(--borda); border-radius: 8px; padding: 10px;
+    font: 12.5px/1.45 ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-all;
+  }
+  .aviso-criar { color: var(--aviso); font-size: 13px; min-height: 1.4em; margin: 6px 0 0; }
 </style>
 </head>
 <body>
@@ -87,7 +106,7 @@
   <p class="sub">Os mesmos JSON de forma e de animação do pacote Python, as mesmas poses, desenhadas em SVG. Um laço só
     para todos os mascotes da página; quem sai da tela para de desenhar.</p>
 
-  <section aria-label="Controles">
+  <section aria-label="Controles" id="controles">
     <div class="controles">
       <div class="grupo"><span>Pacote</span><div class="seg" id="pacote" role="group" aria-label="Pacote de animações"></div></div>
       <div class="grupo so-desenho"><span>Desenho</span><div class="seg" id="volume" role="group" aria-label="Volume">
@@ -106,6 +125,38 @@
         <button type="button" data-v="verde" aria-pressed="true">verde</button><button type="button" data-v="ambar" aria-pressed="false">âmbar</button><button type="button" data-v="branco" aria-pressed="false">branco</button><button type="button" data-v="mascote" aria-pressed="false">do mascote</button></div></div>
       <div class="grupo so-terminal"><label for="limite"><span>Limite (dado ao vivo)</span></label>
         <input type="range" id="limite" min="0" max="100" step="1" value="92"><output id="limiteValor" for="limite">92%</output></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-criar" id="criar">
+    <h2 id="t-criar">Criar mascote</h2>
+    <p class="sub">Escolha uma família e mexa nos parâmetros: a forma é calculada na hora, os olhos vão sozinhos para o
+      lugar e a mesma receita dá sempre o mesmo mascote (aqui e no Python: <code>python -m mascotinhos gerar</code>).</p>
+    <div class="criar-grid">
+      <div>
+        <div class="palco" id="criarPalco"></div>
+        <div class="minis" id="criarEstados"></div>
+      </div>
+      <div>
+        <label class="campo"><span>família</span><select id="criarFamilia" aria-label="Família"></select></label>
+        <div id="criarParametros"></div>
+        <label class="campo"><span>semente</span><input type="number" id="criarSemente" min="0" max="4294967295" step="1" value="7"></label>
+        <label class="campo"><span>cor</span><input type="color" id="criarCor" value="#e7c25e" aria-label="Cor do mascote criado"></label>
+        <div class="acoes">
+          <button type="button" class="leve" id="criarOutraSemente">outra semente</button>
+          <button type="button" class="leve" id="criarSortear">sortear tudo</button>
+        </div>
+        <p class="aviso-criar" id="criarAviso" aria-live="polite"></p>
+      </div>
+      <div>
+        <label class="campo" style="grid-template-columns: 96px minmax(0, 1fr)"><span>o JSON</span>
+          <select id="criarQual" aria-label="Qual JSON mostrar"><option value="receita">a receita (curta)</option><option value="forma">a forma pronta (contrato v1)</option></select></label>
+        <pre class="json" id="criarJson" tabindex="0" aria-label="O JSON do mascote criado"></pre>
+        <div class="acoes">
+          <button type="button" id="criarCopiar">copiar JSON</button>
+          <button type="button" class="leve" id="criarUsar">pôr no palco e na galeria</button>
+        </div>
+      </div>
     </div>
   </section>
 

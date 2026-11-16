@@ -366,8 +366,9 @@ navegador  montar(el, { forma: "bolota", estado: "esperando", pacote: "vivo", co
 </table>
 
 **Um mascote seu** é um arquivo JSON com o contorno e os olhos (ver [Formas](#formas)): `--formas minha_pasta` no
-terminal, `oa.carregar_pasta("minha_pasta")` no Python, e no navegador o próprio JSON em `forma`. No navegador a cor
-padrão é sempre a laranja: passe `cor` para usar a de cada mascote.
+terminal, `oa.carregar_pasta("minha_pasta")` no Python, e no navegador o próprio JSON em `forma`. Não quer desenhar o
+contorno? Veja [Crie o seu mascote](#crie-o-seu-mascote). Sem `cor`, cada mascote que vem junto usa a sua cor sugerida,
+também no navegador; um JSON seu, sem cor, sai na laranja padrão.
 
 ### O que combina com o quê
 
@@ -448,6 +449,106 @@ chaves no `config.json` dele:
 Por dentro são duas linhas: `Biblioteca.carregar(pacote=...)` e `Estilo(volume=... | terminal=Terminal(...))`. No
 alerta, ele passa o uso real em `Terminal(dados={"limite": ...})`.
 
+## Crie o seu mascote
+
+Não precisa desenhar. Você escreve uma **receita** pequena (a família e alguns números) e o gerador calcula a forma:
+o contorno, os cantos arredondados, o tamanho certo e os olhos no lugar. O que sai é um mascote como os outros: vale em
+todos os pacotes e visuais de cima.
+
+<table>
+<tr><td width="170"><img src="docs/exemplos/gerador-cometa.gif" width="156" alt="Estrela rosa de seis pontas, gerada de uma receita, comemorando"></td><td>
+
+**A receita** é um JSON de uma linha. Esta está em `exemplos/receitas/cometa.json`:
+
+```json
+{"familia": "estrela", "pontas": 6, "arredonda": 0.8, "miolo": 0.7, "semente": 7, "cor": "#E58FB0", "nome": "Cometa"}
+```
+
+```text
+terminal   python -m mascotinhos gif exemplos/receitas/cometa.json concluido --pacote vivo -o cometa.gif
+Python     oa.quadro(oa.ler_definicao(oa.gerar({"familia": "estrela", "pontas": 6, "cor": "#E58FB0"})), "concluido", 1.0, "#E58FB0")
+navegador  montar(el, { forma: { familia: "estrela", pontas: 6, cor: "#E58FB0" }, estado: "concluido", pacote: "vivo" })
+```
+
+</td></tr>
+</table>
+
+### As dez famílias
+
+Cada uma com os parâmetros no padrão. Para começar: `python -m mascotinhos gerar FAMILIA -o meu.json`.
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/exemplos/gerador-bolha.png" width="156" alt="Mascote gerado da família bolha"><br>`bolha` | <img src="docs/exemplos/gerador-nuvem.png" width="156" alt="Mascote gerado da família nuvem"><br>`nuvem` | <img src="docs/exemplos/gerador-planeta.png" width="156" alt="Mascote gerado da família planeta"><br>`planeta` |
+| <img src="docs/exemplos/gerador-estrela.png" width="156" alt="Mascote gerado da família estrela"><br>`estrela` | <img src="docs/exemplos/gerador-engrenagem.png" width="156" alt="Mascote gerado da família engrenagem"><br>`engrenagem` | <img src="docs/exemplos/gerador-gota.png" width="156" alt="Mascote gerado da família gota"><br>`gota` |
+| <img src="docs/exemplos/gerador-escudo.png" width="156" alt="Mascote gerado da família escudo"><br>`escudo` | <img src="docs/exemplos/gerador-fantasma.png" width="156" alt="Mascote gerado da família fantasma"><br>`fantasma` | <img src="docs/exemplos/gerador-bloco.png" width="156" alt="Mascote gerado da família bloco"><br>`bloco` |
+| <img src="docs/exemplos/gerador-broto.png" width="156" alt="Mascote gerado da família broto"><br>`broto` |  |  |
+
+### Os parâmetros mudam a forma
+
+Cada família tem os seus (a lista inteira, com as faixas, está em [docs/gerador.md](docs/gerador.md)). Três exemplos:
+
+**`pontas`** da estrela: quantas pontas.
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/exemplos/gerador-pontas-4.png" width="156" alt="Estrela de quatro pontas"><br>`--pontas 4` | <img src="docs/exemplos/gerador-pontas-6.png" width="156" alt="Estrela de seis pontas"><br>`--pontas 6` | <img src="docs/exemplos/gerador-pontas-8.png" width="156" alt="Estrela de oito pontas"><br>`--pontas 8` |
+
+**`arredonda`**: de cantos vivos (0) a bem redondos (1).
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/exemplos/gerador-arredonda-0.png" width="156" alt="Estrela de cantos vivos"><br>`--arredonda 0` | <img src="docs/exemplos/gerador-arredonda-05.png" width="156" alt="Estrela de cantos meio arredondados"><br>`--arredonda 0.5` | <img src="docs/exemplos/gerador-arredonda-1.png" width="156" alt="Estrela de cantos bem redondos"><br>`--arredonda 1` |
+
+**`enfeite`**: orelhas, antena ou rabo por cima de qualquer família.
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/exemplos/gerador-enfeite-orelhas.png" width="156" alt="Bloco com orelhas"><br>`--enfeite orelhas` | <img src="docs/exemplos/gerador-enfeite-antena.png" width="156" alt="Bloco com antena"><br>`--enfeite antena` | <img src="docs/exemplos/gerador-enfeite-rabo.png" width="156" alt="Bloco com rabo"><br>`--enfeite rabo` |
+
+Algumas famílias têm variações de estilo:
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/exemplos/gerador-dente-reto.png" width="156" alt="Engrenagem de dentes retos"><br>`gerar engrenagem --dente reto` | <img src="docs/exemplos/gerador-estilo-degrau.png" width="156" alt="Bloco com cantos em degraus"><br>`gerar bloco --estilo degrau` | <img src="docs/exemplos/gerador-ponta-cima.png" width="156" alt="Gota com a ponta para cima"><br>`gerar gota --ponta cima` |
+
+### A semente: a mesma receita, sempre o mesmo mascote
+
+A `semente` é um número inteiro que decide os detalhes sorteados (o tamanho de cada gomo da nuvem, as ondas da bolha,
+o lado da folha). Trocou a semente, mudou o mascote; repetiu a semente, ele volta **igual**, no Python e no navegador.
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/exemplos/gerador-semente-1.png" width="156" alt="Nuvem de quatro gomos, semente 1"><br>`gerar nuvem --gomos 4 --semente 1` | <img src="docs/exemplos/gerador-semente-2.png" width="156" alt="Nuvem de quatro gomos, semente 2"><br>`--semente 2` | <img src="docs/exemplos/gerador-semente-3.png" width="156" alt="Nuvem de quatro gomos, semente 3"><br>`--semente 3` |
+
+### Sorteie vários
+
+Sem ideia? Peça uma pasta de mascotes sorteados (cada dezena passa pelas dez famílias) e veja todos numa prancha:
+
+```bash
+python -m mascotinhos gerar --aleatorio 12 --semente 21 --pasta saida/sorteados
+python -m mascotinhos folha --formas saida/sorteados --pacote vivo -o saida/sorteados.png
+```
+
+Os três primeiros dessa semente, e dois deles nos outros visuais:
+
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/exemplos/gerador-sorteado-1.png" width="156" alt="Primeiro mascote sorteado"><br>o primeiro | <img src="docs/exemplos/gerador-sorteado-2.png" width="156" alt="Segundo mascote sorteado"><br>o segundo | <img src="docs/exemplos/gerador-sorteado-3.png" width="156" alt="Terceiro mascote sorteado"><br>o terceiro |
+| <img src="docs/exemplos/gerador-volume.gif" width="156" alt="O primeiro sorteado com volume, trabalhando"><br>o primeiro, `--pacote 3d` | <img src="docs/exemplos/gerador-terminal.gif" width="156" alt="O segundo sorteado em estilo terminal, trabalhando"><br>o segundo, `--pacote terminal` | |
+
+### Onde usar a receita
+
+| Onde | Como |
+| --- | --- |
+| **Terminal** | `gerar FAMILIA --parametro V -o meu.json` grava a forma pronta; `gif`, `tira`, `svg` e `folha` aceitam o arquivo da receita no lugar da forma (`folha receita1.json receita2.json`); `validar receita.json` confere |
+| **Python** | `oa.gerar(receita)` devolve a forma (o JSON do contrato v1); `oa.receita_aleatoria(semente)` e `oa.aleatorios(12)` sorteiam; `oa.cor_da_receita(receita)` dá a cor |
+| **Navegador** | a receita vai direto em `forma`; `gerar`, `receitaAleatoria` e `aleatorios` são os mesmos; a demonstração (`js/demo/`) tem o painel **Criar mascote**, com controles e o botão de copiar o JSON |
+
+A receita aceita ainda `id`, `nome` e, se você quiser decidir, `olhos` (`x`, `y`, `spacing`, `scale`); sem `olhos`,
+eles vão sozinhos para o maior espaço livre do rosto. Toda forma que sai passa pela mesma conferência das feitas à mão
+(`validar_definicao`, sem erro e sem aviso); uma receita impossível dá um erro que diz o que mudar.
+
 ## Por dentro
 
 - **Só Pillow.** Nada de numpy, rede ou download: roda dentro de um app assinado e notarizado.
@@ -474,12 +575,14 @@ alerta, ele passa o uso real em `Terminal(dados={"limite": ...})`.
 | `mascotinhos/terminal.py` | O estilo terminal: o quadro em células de caracteres (ascii, blocos ou contorno), com fósforo, varredura e halo |
 | `mascotinhos/fonte_bitmap.py` | A fonte de pontos do terminal (6x8), desenhada para a biblioteca |
 | `mascotinhos/animador.py` | O `Animador`: estado, mistura entre estados, troca de forma, realce de cor |
+| `mascotinhos/gerador.py` | O gerador: dez famílias de formas com parâmetros, enfeites, semente e olhos postos sozinhos; da receita à forma conferida |
 | `mascotinhos/cli.py` | A linha de comando (`python -m mascotinhos`) |
 | `mascotinhos/formas_exemplo/` | Os doze mascotes que vêm junto (Bolota, Broto, Fantasma e os nove do Ombro Screen) e o `_cores.json` com a cor sugerida de cada um |
-| `exemplos/` | Uma animação nova feita só com JSON (`dancando.json`) e a biblioteca usada no código |
+| `exemplos/` | Uma animação nova feita só com JSON (`dancando.json`), uma receita do gerador (`receitas/cometa.json`) e a biblioteca usada no código |
 | `GUIA_IA.md` | Uma página para um agente de IA criar formas e animações sem ler o código |
 | `docs/emocoes.md` | Nota de design: como olhos, corpo, ritmo e extras dizem cada emoção, e as regras para 5 quadros por segundo |
 | `docs/3d.md` | O 3D opcional: o que cada parâmetro faz, quanto custa, o que é aproximado no SVG e os limites |
+| `docs/gerador.md` | O gerador de mascotes: cada família e cada parâmetro, os enfeites, a semente, os olhos e a API |
 | `docs/terminal.md` | O estilo terminal: a grade, as tintas, os extras de texto, os valores de quem desenha e o que é aproximado |
 
 ## Instalar
@@ -738,10 +841,14 @@ python -m mascotinhos folha [--t 1.2] [--escala 1]        PNG com todas as forma
 python -m mascotinhos tira <forma> <estado>               PNG com quadros seguidos (--segundos 2 --quadros 10)
 python -m mascotinhos gif <forma> <estado>                GIF (--segundos 4 --fps 20 --escala 2)
 python -m mascotinhos svg <forma> <estado> --t 0.4        o quadro de um instante em SVG
-python -m mascotinhos validar <arquivo.json> [...]        confere formas e animações
+python -m mascotinhos gerar <familia> [--parametro V]     cria a forma de um mascote novo (--semente, --cor, --enfeite)
+python -m mascotinhos gerar --aleatorio 12 --pasta P      sorteia vários numa pasta (com as cores e as receitas)
+python -m mascotinhos gerar --de receita.json             a forma de uma receita gravada
+python -m mascotinhos validar <arquivo.json> [...]        confere formas, animações e receitas
 ```
 
-`<forma>` é um id da pasta `--formas` (sem ela, as de exemplo) ou o caminho de um `.json`; `<estado>`, um estado da
+`<forma>` é um id da pasta `--formas` (sem ela, as de exemplo) ou o caminho de um `.json` (uma forma ou uma receita do
+gerador; a `folha` também aceita uma lista desses arquivos); `<estado>`, um estado da
 biblioteca, de `--animacoes`, ou o caminho de um `.json`. Também: `--pacote vivo` ou `--pacote 3d` (este já liga o
 volume; `--chapado` desliga), `--pacote terminal` (já liga o estilo terminal), `--estilo terminal` com `--tinta
 ascii|blocos|contorno` e `--fosforo verde|ambar|branco|mascote` (qualquer pacote em caracteres), `--volume` (luz,
@@ -757,15 +864,17 @@ python -m unittest discover -s tests
 ```
 
 `tests/test_referencia.py` guarda o movimento dos seis estados (os mesmos números do mascote do Ombro antes de virar
-biblioteca, em qualquer máquina) e os pixels das formas de exemplo (só na plataforma e nas versões de Pillow e FreeType
-em que foram gerados; em outras, é pulado). Mudou o desenho de propósito? `python tests/test_referencia.py --gerar`.
+biblioteca, em qualquer máquina) e os pixels das formas de exemplo (só na plataforma e nas versões de Python, Pillow e
+FreeType em que foram gerados; em outras, é pulado). `tests/test_gerador.py` passa cada família do gerador pelos
+extremos dos parâmetros e duzentas receitas sorteadas pelos três estilos. Os limites de tempo por quadro valem na sua
+máquina; com a variável `CI` definida (os servidores de teste), viram só um teto folgado. Mudou o desenho de propósito? `python tests/test_referencia.py --gerar`.
 
 ## O que vem depois
 
 - **Fase 2, o player do app:** o mesmo JSON tocado em TypeScript (as seis primitivas, as fases e os extras são poucas
   linhas cada), conferido contra `svg.py` com os mesmos instantes de `tests/test_referencia.py`.
-- **Fase 3, formas geradas:** um gerador paramétrico de formas originais (contorno por harmônicos, cantos e simetria
-  como parâmetros), que já sai validado por `validar_definicao`.
+- **Mais famílias e enfeites no gerador** (ver [Crie o seu mascote](#crie-o-seu-mascote)): hoje são dez famílias e
+  três enfeites; uma família nova é uma função pequena em `mascotinhos/gerador.py` e a irmã dela em `js/src/gerador.js`.
 
 ## Licença
 

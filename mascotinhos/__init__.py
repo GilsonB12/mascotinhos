@@ -16,6 +16,7 @@ from .desenho import Estilo, Forma, Paleta, desenhar, fonte_padrao, forma_de, qu
 from .formas import (Definicao, DefinicaoInvalida, Olhos, carregar_definicao, carregar_pasta, cor_hex, cor_sugerida,
                      cores_da_pasta, dentro,
                      exemplos, ler_definicao, poligonos, validar_definicao)
+from .gerador import FAMILIAS, ReceitaInvalida, aleatorios, conferir_receita, cor_da_receita, gerar, receita_aleatoria
 from .movimento import CAMPOS, NEUTRO, misturar
 from .palco import Enquadramento
 from .terminal import Terminal
@@ -24,6 +25,7 @@ from .svg import desenhar_svg, quadro_svg
 
 __version__ = "0.1.0"
 __all__ = [
+    "FAMILIAS", "ReceitaInvalida", "aleatorios", "conferir_receita", "cor_da_receita", "gerar", "receita_aleatoria",
     "Animacao", "AnimacaoInvalida", "Animador", "Biblioteca", "CAMPOS", "DURACAO_MISTURA", "Definicao",
     "DefinicaoInvalida", "Enquadramento", "Estilo", "Forma", "NEUTRO", "Olhos", "Paleta", "REALCE", "TRANSICAO", "Terminal", "Volume",
     "biblioteca_padrao", "carregar_animacao", "carregar_definicao", "carregar_pasta", "cor_hex", "cor_sorteada", "cor_sugerida", "cores_da_pasta",

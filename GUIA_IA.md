@@ -15,6 +15,28 @@ Leia só esta página. Uma forma nova ou uma animação nova é **um arquivo JSO
 
 Grave as prévias fora de `mascotinhos/` (a linha de comando recusa gravar lá dentro).
 
+## Mascote novo sem desenhar: a receita do gerador
+
+Para um mascote novo, **prefira a receita**: você não escreve o path nem acerta os olhos.
+
+```json
+{"familia": "estrela", "pontas": 6, "arredonda": 0.8, "semente": 7, "cor": "#E58FB0", "nome": "Cometa"}
+```
+
+- `familia`: `bolha`, `nuvem`, `planeta`, `estrela`, `engrenagem`, `gota`, `escudo`, `fantasma`, `bloco` ou `broto`.
+  Os parâmetros de cada uma (todos opcionais) e as faixas estão em `docs/gerador.md`; um nome ou valor errado dá um
+  erro que lista o que vale.
+- Em qualquer família: `semente` (inteiro; muda os detalhes sorteados, e a mesma dá sempre o mesmo mascote), `cor`
+  (`#RRGGBB`), `enfeite` (`orelhas`, `antena`, `rabo`), `id`, `nome`.
+- Veja: `python -m mascotinhos folha receita.json --pacote vivo -o saida/folha.png` (aceita várias receitas);
+  `gif receita.json esperando -o saida/x.gif`. Confira: `python -m mascotinhos validar receita.json`.
+- Quer a forma pronta (contrato v1, para o app ou para editar à mão)? `python -m mascotinhos gerar --de receita.json
+  -o minha-forma.json`. Sem ideia? `python -m mascotinhos gerar --aleatorio 12 --pasta saida/sorteados` e depois
+  `folha --formas saida/sorteados -o saida/sorteados.png`; as receitas ficam em `saida/sorteados/_receitas.json`.
+- No código: `oa.gerar(receita)` (Python) e `gerar(receita)` (navegador) devolvem a mesma forma.
+
+Só escreva o path à mão (abaixo) quando nenhuma família servir.
+
 ## Forma: `<id>.json`
 
 ```json

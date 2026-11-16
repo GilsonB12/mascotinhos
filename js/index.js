@@ -9,7 +9,7 @@ import { FORMAS } from "./dados/embutidos.js";
 import { Definicao, lerDefinicao } from "./src/formas.js";
 
 export { montar, montadosAgora, aplicarNos } from "./src/runtime.js";
-export { quadroSvg, desenharSvg, nosDoQuadro, documentoSvg, PintorSVG, paraTexto, resolverForma, caixaDoEnquadre, n2 } from "./src/svg.js";
+export { quadroSvg, desenharSvg, nosDoQuadro, documentoSvg, PintorSVG, paraTexto, resolverForma, corPropria, caixaDoEnquadre, n2 } from "./src/svg.js";
 export { Terminal, Malha, Grade, TINTAS, FOSFOROS, gradeTerminal, nosDoTerminal, corpoEmCelulas } from "./src/terminal.js";
 export { glifo, semGlifo, tem as temGlifo } from "./src/fonte.js";
 export { Animador, corSorteada, DURACAO_MISTURA, TRANSICAO, REALCE, COR_PADRAO } from "./src/animador.js";
@@ -19,6 +19,10 @@ export {
 export {
   Definicao, DefinicaoInvalida, lerDefinicao, validarDefinicao, poligonos, dentro, enrolamento, limites, aumentoOlhos, corHex,
 } from "./src/formas.js";
+export {
+  FAMILIAS, ENFEITES, CORES_DO_GERADOR, ReceitaInvalida, gerar, conferirReceita, corDaReceita, ehReceita, receitaAleatoria, aleatorios,
+  parametrosDa, olhosPara, sorteio,
+} from "./src/gerador.js";
 export { CAMPOS, NEUTRO, OPCIONAIS, CURVAS, MovimentoInvalido, compilar, misturar, suave } from "./src/movimento.js";
 export { Forma, formaDe, pintar, criarEstilo, estiloDasOpcoes, ESTILO_PADRAO, PALETA_PADRAO } from "./src/desenho.js";
 export { Enquadramento, corpo, capsula, CX, BX0, BX1, BY0, BY1, VB_X, VB_Y, VB_W, VB_H } from "./src/palco.js";
@@ -44,10 +48,11 @@ export function coresSugeridas() {
   return c && typeof c === "object" ? { ...c } : {};
 }
 
-/** O que é este JSON: "forma", "animação" ou null (a mesma regra da linha de comando do Python). */
+/** O que é este JSON: "forma", "animação", "receita" (do gerador) ou null (a mesma regra da linha de comando do Python). */
 export function tipoDeArquivo(dados) {
   if (typeof dados !== "object" || dados === null || Array.isArray(dados)) return null;
   if ("formato" in dados) return "animação";
+  if ("familia" in dados) return "receita";
   if ("body" in dados || "eyes" in dados || ("version" in dados && "id" in dados)) return "forma";
   return null;
 }

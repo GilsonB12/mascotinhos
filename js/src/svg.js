@@ -5,6 +5,7 @@ import { bibliotecaDoPacote, lerAnimacao, Animacao, Biblioteca } from "./animaca
 import { ESTILO_PADRAO, Forma, estiloDasOpcoes, formaDe, pintar } from "./desenho.js";
 import { gradeTerminal, nosDoTerminal } from "./terminal.js";
 import { FORMAS } from "../dados/embutidos.js";
+import { corDaReceita, ehReceita, gerar } from "./gerador.js";
 import { corHex, lerDefinicao } from "./formas.js";
 import { BX0, BX1, BY0, BY1 } from "./palco.js";
 import { fixo, hex2 } from "./util.js";
@@ -208,15 +209,27 @@ export function desenharSvg(forma, p, anim, t, cor, alphaExtras = 1.0, estilo = 
   return documentoSvg(estilo.enquadramento, defs, elementos);
 }
 
-/** Resolve uma forma: Definicao, Forma, o JSON dela ou o id de uma forma de exemplo. */
+/** Resolve uma forma: Definicao, Forma, o JSON dela, uma receita do gerador ou o id de uma forma de exemplo. */
 export function resolverForma(forma) {
   if (forma instanceof Forma) return forma;
+  if (ehReceita(forma)) return formaDe(gerar(forma));
   if (typeof forma === "string") {
     const ids = Object.keys(FORMAS).filter((k) => !k.startsWith("_")).sort();
     if (!ids.includes(forma)) throw new Error(`forma desconhecida: '${forma}' (há: ${ids.join(", ")})`);
     return formaDe(lerDefinicao(FORMAS[forma], forma));
   }
   return formaDe(forma);
+}
+
+/**
+ * A cor própria de uma forma, em "#RRGGBB": a da receita do gerador, ou a sugerida para uma forma que vem com a
+ * biblioteca (o _cores.json). null se ela não tem cor própria.
+ */
+export function corPropria(forma) {
+  if (ehReceita(forma)) return corDaReceita(forma);
+  const id = typeof forma === "string" ? forma : forma && typeof forma === "object" ? forma.id : null;
+  const cores = FORMAS._cores;
+  return typeof id === "string" && cores && typeof cores[id] === "string" ? cores[id] : null;
 }
 
 /** Resolve um estado: o nome (na biblioteca), uma Animacao ou o JSON de uma. */
@@ -244,6 +257,6 @@ export function quadroSvg(forma, estado, t, opcoes = {}) {
   const anim = resolverAnimacao(estado, resolverBiblioteca(opcoes));
   const estilo = estiloDasOpcoes(opcoes);
   const desenhado = opcoes.extras === false ? Object.create(anim, { extras: { value: [] } }) : anim;
-  const { defs, elementos } = nosDoQuadro(f, anim.parametros(t), desenhado, t, corHex(opcoes.cor || "#E07A57"), 1.0, estilo, opcoes.prefixo || "");
+  const { defs, elementos } = nosDoQuadro(f, anim.parametros(t), desenhado, t, corHex(opcoes.cor || corPropria(forma) || "#E07A57"), 1.0, estilo, opcoes.prefixo || "");
   return documentoSvg(estilo.enquadramento, defs, elementos, opcoes.enquadre);
 }

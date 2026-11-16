@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Mascotes animados em Python puro: formas e animações em JSON, desenho com Pillow, saída em PNG, GIF e SVG."
 readme = "README.md"
 license = { text = "MIT" }
-authors = [{ name = "Contribuidores do mascotinhos" }]
+authors = [{ name = "Jonas Timbaúba" }, { name = "João Vitor Lima" }, { name = "Gilson Bezerra" }]
 requires-python = ">=3.9"
 dependencies = ["Pillow>=10.0"]
 keywords = ["mascote", "avatar", "animação", "pillow", "svg"]

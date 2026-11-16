@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>mascotinhos · folha</title>
+<!--
+  A mesma prancha do `python -m mascotinhos folha` (as formas de exemplo em todos os estados, num instante), desenhada
+  pelo player em JavaScript, no mesmo leiaute, para comparar lado a lado. Parâmetros na URL:
+    ?pacote=vivo&volume=1&t=1.2&escala=2      (e, para o terminal: ?pacote=terminal&tinta=blocos&fosforo=ambar)
+-->
+<style>
+  html, body { margin: 0; background: #121110; }
+  body { position: relative; font-family: system-ui, "Segoe UI", sans-serif; color: rgb(229, 229, 229); }
+  .rot { position: absolute; white-space: nowrap; }
+  .meio { transform: translate(-50%, -50%); }
+  .esq { transform: translateY(-50%); }
+  .cel { position: absolute; }
+  .cel svg { display: block; }
+</style>
+</head>
+<body>
+<script type="module">
+  import { bibliotecaDoPacote, exemplos, pacotes, quadroSvg } from "../index.js";
+
+  const q = new URLSearchParams(location.search);
+  const pacote = pacotes().includes(q.get("pacote")) ? q.get("pacote") : "classico";
+  const volume = q.has("volume") ? q.get("volume") === "1" : pacote === "3d";
+  // o estilo terminal: ?estilo=terminal (o pacote terminal já liga), &tinta=ascii|blocos|contorno, &fosforo=verde...
+  const terminal = {};
+  for (const k of ["estilo", "tinta", "fosforo"]) if (q.has(k)) terminal[k] = q.get(k);
+  const t = Number(q.get("t") ?? 1.2);
+  const e = Math.max(1, Math.round(Number(q.get("escala") ?? 1)));
+  const CORES = ["#E07A57", "#7FB77E", "#6FA8DC", "#E8B04B", "#C58AD8", "#6FA3A0", "#E58FB0"];
+  const cw = 156 * e, ch = 170 * e, margem = 12 * e, rotulo = 90 * e, topo = 26 * e;
+  const estados = bibliotecaDoPacote(pacote).estados();
+  const formas = Object.values(exemplos());
+  document.body.style.width = `${margem + rotulo + estados.length * cw + margem}px`;
+  document.body.style.height = `${topo + formas.length * ch + margem}px`;
+
+  function texto(s, x, y, classe, tam, cor) {
+    const el = document.createElement("div");
+    el.className = `rot ${classe}`;
+    el.textContent = s;
+    Object.assign(el.style, { left: `${x}px`, top: `${y}px`, fontSize: `${tam}px` });
+    if (cor) el.style.color = cor;
+    document.body.append(el);
+  }
+
+  estados.forEach((est, j) => texto(est, margem + rotulo + j * cw + cw / 2, topo / 2, "meio", 11 * e));
+  formas.forEach((d, i) => {
+    const y = topo + i * ch;
+    texto(d.nome, margem, y + ch / 2, "esq", 11 * e);
+    texto(d.id, margem, y + ch / 2 + 14 * e, "esq", 9 * e, "rgb(133, 133, 133)");
+    estados.forEach((est, j) => {
+      const cel = document.createElement("div");
+      cel.className = "cel";
+      Object.assign(cel.style, { left: `${margem + rotulo + j * cw}px`, top: `${y}px` });
+      // texto gerado aqui mesmo pelo quadroSvg (números e cores conferidos): seguro para innerHTML
+      cel.innerHTML = quadroSvg(d, est, t, {
+        pacote, volume, ...terminal, cor: CORES[i % CORES.length], prefixo: `f${i}-${j}-`,
+        enquadramento: { largura: 156 * e, altura: 170 * e, alturaUtil: 168 * e },
+      });
+      document.body.append(cel);
+    });
+  });
+  document.title = `folha ${pacote}${volume ? " com volume" : ""} t=${t}`;
+</script>
+</body>
+</html>

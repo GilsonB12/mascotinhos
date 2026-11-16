@@ -1,0 +1,42 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "trabalhando",
+  "ordem": 2,
+  "descricao": "Trabalhando: concentrado, de pálpebras baixas, lendo linha por linha e balançando no ritmo; linhas se escrevem de um lado e uma engrenagem gira do outro.",
+  "olhos": "semicerrados",
+  "campos": {
+    "kL": 1.05,
+    "kW": 1.25,
+    "olhoAng": -10,
+    "olhaY": 8,
+    "dy": {"quique": {"periodo": 1.1, "amp": -9}},
+    "sy": {"quique": {"periodo": 1.1, "medida": "amasso", "amp": -0.06, "base": 1}},
+    "sx": {"quique": {"periodo": 1.1, "medida": "amasso", "amp": 0.04, "base": 1}},
+    "rot": {"onda": {"periodo": 3.3, "amp": 2}}
+  },
+  "trilhas": [
+    {
+      "nome": "lendo",
+      "ciclo": 2.6,
+      "fases": [
+        {"de": 0, "dur": 1.95, "nota": "os olhos andam pela linha, aos saltos",
+         "olhaX": {"rampa": {"de": -20, "para": 20, "curva": "linear", "passos": 5}}},
+        {"de": 1.95, "dur": 0.65, "nota": "volta ao começo da linha de baixo",
+         "olhaX": {"rampa": {"de": 20, "para": -20}},
+         "olhaY": {"arco": {"amp": 4, "base": 8}}}
+      ]
+    },
+    {
+      "nome": "piscada rápida",
+      "ciclo": 3.9,
+      "fases": [
+        {"de": 3.3, "dur": 0.25, "pisca": 1}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "linhas", "n": 3, "ciclo": 2.6, "largura": 50, "ancora": "topo-esq", "dx": -6, "dy": -72, "tamanho": 1.5},
+    {"tipo": "engrenagem", "periodo": 3.7, "ancora": "topo-dir", "dx": -14, "dy": -40, "tamanho": 1.6}
+  ]
+}

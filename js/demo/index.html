@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mascotinhos · player</title>
+<style>
+  :root {
+    --fundo: #121110;
+    --painel: #1b1a18;
+    --borda: #2c2a27;
+    --texto: #ece7df;
+    --apagado: #9a948b;
+    --destaque: #e07a57;
+    --erro: #e5604f;
+    --aviso: #e8b04b;
+    --ok: #7fb77e;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--texto);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 12px; color: var(--texto); }
+  p.sub { margin: 0 0 20px; color: var(--apagado); max-width: 70ch; }
+  code { font-family: ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace; font-size: 13px; color: #d9c7a8; }
+  section { background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .controles { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
+  .grupo { display: flex; align-items: center; gap: 8px; }
+  .grupo > span { color: var(--apagado); font-size: 13px; }
+  .seg { display: inline-flex; border: 1px solid var(--borda); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    background: transparent; color: var(--texto); border: 0; padding: 6px 12px; font: inherit; font-size: 14px; cursor: pointer;
+  }
+  .seg button + button { border-left: 1px solid var(--borda); }
+  .seg button[aria-pressed="true"] { background: #33302c; color: #fff; }
+  .seg button:focus-visible, .botoes button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--destaque); outline-offset: 2px; }
+  input[type="color"] { width: 40px; height: 30px; border: 1px solid var(--borda); border-radius: 6px; background: none; padding: 2px; cursor: pointer; }
+  label.check { display: inline-flex; gap: 6px; align-items: center; color: var(--apagado); font-size: 14px; cursor: pointer; }
+  .linha2 { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--borda); }
+  .so-terminal[hidden], .so-desenho[hidden] { display: none; }
+  .grupo label span { color: var(--apagado); font-size: 13px; }
+  input[type="range"] { width: 140px; accent-color: var(--destaque); }
+  output { font-variant-numeric: tabular-nums; min-width: 3.5ch; color: var(--texto); font-size: 14px; }
+  .galeria { overflow-x: auto; }
+  table { border-collapse: collapse; }
+  th { font-weight: 600; font-size: 13px; color: var(--apagado); padding: 4px 6px; text-align: center; white-space: nowrap; }
+  th.linha { text-align: left; color: var(--texto); padding-right: 14px; }
+  th.linha small { display: block; color: var(--apagado); font-weight: 400; }
+  td { padding: 0; }
+  .celula { width: 156px; height: 170px; }
+  .palco-grid { display: grid; grid-template-columns: minmax(0, 340px) 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .palco-grid { grid-template-columns: 1fr; } }
+  .palco { width: 100%; max-width: 340px; aspect-ratio: 156 / 170; background: #0d0c0b; border: 1px solid var(--borda); border-radius: 10px; }
+  .botoes { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+  .botoes button {
+    background: #26241f; color: var(--texto); border: 1px solid var(--borda); border-radius: 999px; padding: 4px 12px;
+    font: inherit; font-size: 14px; cursor: pointer;
+  }
+  .botoes button[aria-pressed="true"] { border-color: var(--destaque); color: #fff; }
+  .rotulo { color: var(--apagado); font-size: 13px; margin: 6px 0 4px; }
+  textarea {
+    width: 100%; min-height: 150px; resize: vertical; background: #0d0c0b; color: var(--texto); border: 1px dashed #4a4640;
+    border-radius: 8px; padding: 10px; font: 13px/1.45 ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  textarea.arrastando { border-color: var(--destaque); background: #1f1a16; }
+  .acoes { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+  .acoes button { background: var(--destaque); color: #1a1209; border: 0; border-radius: 8px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  .acoes button.leve { background: #26241f; color: var(--texto); border: 1px solid var(--borda); font-weight: 400; }
+  ul.msgs { list-style: none; padding: 0; margin: 10px 0 0; font-size: 14px; }
+  ul.msgs li { padding: 4px 0 4px 22px; position: relative; }
+  ul.msgs li::before { position: absolute; left: 0; font-weight: 700; }
+  ul.msgs li.erro { color: var(--erro); } ul.msgs li.erro::before { content: "✕"; }
+  ul.msgs li.aviso { color: var(--aviso); } ul.msgs li.aviso::before { content: "!"; left: 6px; }
+  ul.msgs li.ok { color: var(--ok); } ul.msgs li.ok::before { content: "✓"; }
+  footer { color: var(--apagado); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>mascotinhos · player do navegador</h1>
+  <p class="sub">Os mesmos JSON de forma e de animação do pacote Python, as mesmas poses, desenhadas em SVG. Um laço só
+    para todos os mascotes da página; quem sai da tela para de desenhar.</p>
+
+  <section aria-label="Controles">
+    <div class="controles">
+      <div class="grupo"><span>Pacote</span><div class="seg" id="pacote" role="group" aria-label="Pacote de animações"></div></div>
+      <div class="grupo so-desenho"><span>Desenho</span><div class="seg" id="volume" role="group" aria-label="Volume">
+        <button type="button" data-v="0" aria-pressed="true">chapado</button><button type="button" data-v="1" aria-pressed="false">volume</button></div></div>
+      <div class="grupo"><span>Quadros</span><div class="seg" id="fps" role="group" aria-label="Quadros por segundo">
+        <button type="button" data-v="0" aria-pressed="true">60 fps</button><button type="button" data-v="5" aria-pressed="false">5 fps (telinha)</button></div></div>
+      <div class="grupo"><span>Cor</span><input type="color" id="cor" value="#e07a57" aria-label="Cor do corpo">
+        <label class="check"><input type="checkbox" id="corPorForma" checked> uma cor por forma</label></div>
+    </div>
+    <div class="controles linha2">
+      <div class="grupo"><span>Estilo</span><div class="seg" id="estilo" role="group" aria-label="Estilo de desenho">
+        <button type="button" data-v="chapado" aria-pressed="true">desenho</button><button type="button" data-v="terminal" aria-pressed="false">terminal</button></div></div>
+      <div class="grupo so-terminal"><span>Tinta</span><div class="seg" id="tinta" role="group" aria-label="Tinta do terminal">
+        <button type="button" data-v="ascii" aria-pressed="true">ascii</button><button type="button" data-v="blocos" aria-pressed="false">blocos</button><button type="button" data-v="contorno" aria-pressed="false">contorno</button></div></div>
+      <div class="grupo so-terminal"><span>Fósforo</span><div class="seg" id="fosforo" role="group" aria-label="Cor do fósforo">
+        <button type="button" data-v="verde" aria-pressed="true">verde</button><button type="button" data-v="ambar" aria-pressed="false">âmbar</button><button type="button" data-v="branco" aria-pressed="false">branco</button><button type="button" data-v="mascote" aria-pressed="false">do mascote</button></div></div>
+      <div class="grupo so-terminal"><label for="limite"><span>Limite (dado ao vivo)</span></label>
+        <input type="range" id="limite" min="0" max="100" step="1" value="92"><output id="limiteValor" for="limite">92%</output></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-galeria">
+    <h2 id="t-galeria">Galeria: formas × estados</h2>
+    <div class="galeria"><table id="galeria"></table></div>
+  </section>
+
+  <section aria-labelledby="t-palco">
+    <h2 id="t-palco">Palco: troca de estado e de forma</h2>
+    <div class="palco-grid">
+      <div class="palco" id="palco"></div>
+      <div>
+        <div class="rotulo">Estado (mistura com o anterior por 0,5 s)</div>
+        <div class="botoes" id="estados"></div>
+        <div class="rotulo">Forma (encolhe, pisca e troca no meio)</div>
+        <div class="botoes" id="formas"></div>
+        <div class="rotulo">Cole ou solte aqui o JSON de uma forma ou de uma animação</div>
+        <textarea id="entrada" spellcheck="false" aria-label="JSON de uma forma ou de uma animação"></textarea>
+        <div class="acoes">
+          <button type="button" id="aplicar">Ver no palco</button>
+          <button type="button" class="leve" id="exemploForma">exemplo de forma</button>
+          <button type="button" class="leve" id="exemploAnim">exemplo de animação</button>
+        </div>
+        <ul class="msgs" id="msgs" aria-live="polite"></ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>Código: <code>js/</code> do repositório mascotinhos (MIT). Se a página aparecer vazia, abra por um servidor local
+    (<code>python -m http.server</code> na raiz do repositório e <code>/js/demo/</code>): módulos ES não carregam de
+    <code>file://</code>.</footer>
+</main>
+<script type="module" src="./demo.js"></script>
+</body>
+</html>

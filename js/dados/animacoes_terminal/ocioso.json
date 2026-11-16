@@ -1,0 +1,37 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "ocioso",
+  "ordem": 1,
+  "descricao": "Dormindo, em terminal: olhos fechados (- -), respirando, zzZ subindo e, na última linha, \"> dormindo\" com o cursor piscando devagar; de vez em quando espia com um olho.",
+  "olhos": "fechados",
+  "campos": {
+    "sy": {"onda": {"periodo": 4.2, "amp": 0.05, "base": 0.94}},
+    "sx": {"onda": {"periodo": 4.2, "amp": -0.03, "base": 1.05}},
+    "rot": {"onda": {"periodo": 8.4, "amp": 1.5, "base": 4}},
+    "olhaY": 8
+  },
+  "trilhas": [
+    {
+      "nome": "espiada",
+      "ciclo": 12.6,
+      "fases": [
+        {"de": 8.2, "dur": 0.5, "nota": "estremece no sono",
+         "dy": {"arco": {"amp": -7}},
+         "rot": {"rampa": {"de": 4, "para": 0}}},
+        {"de": 8.7, "dur": 1.3, "nota": "abre um olho, olha em volta e desiste",
+         "olhos": {"esq": "fechados", "dir": "pilulas"},
+         "kL": 0.5,
+         "rot": 0,
+         "olhaX": {"rampa": {"de": -8, "para": 12, "passos": 3, "curva": "linear"}},
+         "olhaY": 2},
+        {"de": 10.0, "dur": 0.8, "nota": "volta a afundar",
+         "rot": {"rampa": {"de": 0, "para": 4}}}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "zzz", "n": 4, "periodo": 4.6, "sobe": 150, "deriva": 70, "ancora": "topo-dir", "dx": -34, "dy": 8},
+    {"tipo": "prompt", "texto": "> dormindo", "digita": 0, "pisca": 2.4}
+  ]
+}

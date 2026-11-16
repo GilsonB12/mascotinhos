@@ -1,0 +1,17 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "alerta",
+  "ordem": 4,
+  "descricao": "Perto do limite: treme de um lado para o outro, de olhos arregalados, suando.",
+  "campos": {
+    "dx": {"produto": [{"onda": {"periodo": 1.1, "amp": 1.5, "base": 4}}, {"treme": {"freq": 12}}]},
+    "sy": 0.97,
+    "sx": 1.03,
+    "kL": 1.28,
+    "kW": 1.1
+  },
+  "extras": [
+    {"tipo": "gota", "periodo": 1.1}
+  ]
+}

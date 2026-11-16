@@ -1,0 +1,33 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "reset",
+  "ordem": 5,
+  "descricao": "O limite reiniciou: comemora com um pulão, de olhos apertados, e solta confete.",
+  "campos": {
+    "kL": 0.6,
+    "kW": 1.05,
+    "olhaY": -6
+  },
+  "trilhas": [
+    {
+      "nome": "pulão",
+      "ciclo": 2.6,
+      "fases": [
+        {"de": 0, "dur": 0.18, "nota": "agacha",
+         "sy": {"rampa": {"base": 1, "amp": -0.12}},
+         "sx": {"rampa": {"base": 1, "amp": 0.08}}},
+        {"de": 0.18, "dur": 1.27, "nota": "no ar: estica e achata uma vez",
+         "dy": {"arco": {"amp": -60}},
+         "sy": {"onda": {"periodo": 1, "x": "q", "amp": 0.14, "base": 1}},
+         "sx": {"onda": {"periodo": 1, "x": "q", "amp": -0.08, "base": 1}}},
+        {"de": 1.45, "dur": 1.15, "nota": "pousa balançando",
+         "sy": {"mola": {"x": "q", "amortece": 5, "voltas": 2.5, "amp": 0.12, "base": 1}},
+         "sx": {"mola": {"x": "q", "amortece": 5, "voltas": 2.5, "amp": -0.07, "base": 1}}}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "confete", "ciclo": 2.6, "de": 0.5, "ate": 2.4}
+  ]
+}

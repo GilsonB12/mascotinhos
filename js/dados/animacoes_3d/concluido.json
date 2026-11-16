@@ -1,0 +1,51 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "concluido",
+  "ordem": 6,
+  "descricao": "Terminou, em 3D: agacha, dá um pulão orgulhoso (a sombra encolhe no chão e a câmera chega perto) com o ✓ se desenhando e estrelas na frente; pousa amassando e fica virando de um lado para o outro, satisfeito.",
+  "olhos": "felizes",
+  "campos": {
+    "olhaY": -3
+  },
+  "trilhas": [
+    {
+      "nome": "pulão orgulhoso",
+      "fases": [
+        {"de": 0, "dur": 0.3, "nota": "agacha fundo (antecipação)",
+         "sy": {"rampa": {"base": 1, "amp": -0.15, "escala": 1.6}},
+         "sx": {"rampa": {"base": 1, "amp": 0.1, "escala": 1.6}},
+         "giroX": {"rampa": {"de": 0, "para": 8, "escala": 1.6}}},
+        {"de": 0.3, "dur": 0.9, "nota": "pulão, esticando na subida, de cabeça erguida",
+         "dy": {"arco": {"amp": -54}},
+         "sy": {"soma": [{"rampa": {"de": 0.85, "para": 1, "escala": 3}}, {"arco": {"amp": 0.13}}]},
+         "sx": {"soma": [{"rampa": {"de": 1.1, "para": 1, "escala": 3}}, {"arco": {"amp": -0.07}}]},
+         "giroX": {"arco": {"amp": -12}},
+         "zoom": {"arco": {"amp": 0.07, "base": 1}}},
+        {"de": 1.2, "dur": 0.4, "nota": "amassa ao pousar",
+         "sy": {"arco": {"amp": -0.13, "base": 1}},
+         "sx": {"arco": {"amp": 0.09, "base": 1}}},
+        {"de": 1.6, "nota": "satisfeito: vira devagar de um lado para o outro, respirando",
+         "rot": {"onda": {"periodo": 5.2, "x": "s", "amp": 2}},
+         "giroY": {"onda": {"periodo": 5.2, "x": "s", "amp": 16}},
+         "sy": {"soma": [{"onda": {"periodo": 3.6, "x": "s", "amp": 0.025, "base": 1}},
+                         {"mola": {"amortece": 6, "rad": 20, "amp": 0.04}}]},
+         "sx": {"onda": {"periodo": 3.6, "x": "s", "amp": -0.015, "base": 1}}}
+      ]
+    },
+    {
+      "nome": "aceno contente",
+      "ciclo": 7.3,
+      "fases": [
+        {"de": 5.4, "dur": 0.9, "nota": "um pulinho de quem lembrou que deu certo",
+         "dy": {"arco": {"amp": -12}}}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "visto", "atraso": 0.35, "desenha": 0.5, "periodo": 2.9, "segue_pulo": true, "dy": -66, "tamanho": 1.4, "prof": 0.6},
+    {"tipo": "faiscas", "de": 0.7, "dur": 1.0, "n": 7, "partida": 50, "raio": 80, "abertura": 230, "cor": "ambar", "dy": -50, "tamanho": 1.6, "prof": 1.2},
+    {"tipo": "faiscas", "de": 0.85, "dur": 0.9, "n": 4, "partida": 78, "raio": 50, "abertura": 150, "cor": "texto", "dy": -50, "tamanho": 1.3, "prof": 0.3},
+    {"tipo": "brilhos", "periodo": 3.3}
+  ]
+}

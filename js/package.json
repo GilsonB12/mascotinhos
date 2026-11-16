@@ -1,0 +1,42 @@
+{
+  "name": "mascotinhos",
+  "version": "0.1.0",
+  "description": "O player dos mascotinhos no navegador: os mesmos JSON de forma e de animação do pacote Python, as mesmas poses, desenhadas em SVG. Sem dependências.",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./dados/*": "./dados/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "src/",
+    "dados/",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "node --test",
+    "sincronizar": "node scripts/sincronizar.mjs",
+    "conferir": "node scripts/sincronizar.mjs --conferir",
+    "referencia": "python scripts/referencia.py"
+  },
+  "keywords": ["mascote", "avatar", "animação", "svg", "mascotinhos"],
+  "license": "MIT",
+  "author": "Jonas Timbaúba, João Vitor Lima, Gilson Bezerra",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GilsonB12/mascotinhos.git",
+    "directory": "js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

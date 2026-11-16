@@ -1,0 +1,46 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "concluido",
+  "ordem": 6,
+  "descricao": "Terminou, em terminal: agacha, dá um pulão com olhos em arco (^ ^) e estrelas, enquanto \"[ OK ] concluído\" é digitado na última linha; depois fica num balanço satisfeito.",
+  "olhos": "felizes",
+  "campos": {
+    "olhaY": -3
+  },
+  "trilhas": [
+    {
+      "nome": "pulão orgulhoso",
+      "fases": [
+        {"de": 0, "dur": 0.3, "nota": "agacha fundo (antecipação)",
+         "sy": {"rampa": {"base": 1, "amp": -0.15, "escala": 1.6}},
+         "sx": {"rampa": {"base": 1, "amp": 0.1, "escala": 1.6}}},
+        {"de": 0.3, "dur": 0.9, "nota": "pulão, esticando na subida",
+         "dy": {"arco": {"amp": -54}},
+         "sy": {"soma": [{"rampa": {"de": 0.85, "para": 1, "escala": 3}}, {"arco": {"amp": 0.13}}]},
+         "sx": {"soma": [{"rampa": {"de": 1.1, "para": 1, "escala": 3}}, {"arco": {"amp": -0.07}}]}},
+        {"de": 1.2, "dur": 0.4, "nota": "amassa ao pousar",
+         "sy": {"arco": {"amp": -0.13, "base": 1}},
+         "sx": {"arco": {"amp": 0.09, "base": 1}}},
+        {"de": 1.6, "nota": "balanço satisfeito, respirando",
+         "rot": {"onda": {"periodo": 5.2, "x": "s", "amp": 3.5}},
+         "sy": {"soma": [{"onda": {"periodo": 3.6, "x": "s", "amp": 0.025, "base": 1}},
+                         {"mola": {"amortece": 6, "rad": 20, "amp": 0.04}}]},
+         "sx": {"onda": {"periodo": 3.6, "x": "s", "amp": -0.015, "base": 1}}}
+      ]
+    },
+    {
+      "nome": "aceno contente",
+      "ciclo": 7.3,
+      "fases": [
+        {"de": 5.4, "dur": 0.9, "nota": "um pulinho de quem lembrou que deu certo",
+         "dy": {"arco": {"amp": -12}}}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "prompt", "texto": "[ OK ] concluído", "digita": 0.8, "cursor": false},
+    {"tipo": "faiscas", "de": 0.7, "dur": 1.0, "n": 7, "partida": 50, "raio": 80, "abertura": 230, "dy": -50},
+    {"tipo": "brilhos", "periodo": 3.3}
+  ]
+}

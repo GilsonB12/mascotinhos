@@ -1,0 +1,35 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "ocioso",
+  "ordem": 1,
+  "descricao": "Nada acontecendo: respira devagar, pisca a cada 4,2 s, de vez em quando olha de relance, e sobe um zZ.",
+  "campos": {
+    "sy": {"onda": {"periodo": 4, "amp": 0.03, "base": 1}},
+    "sx": {"onda": {"periodo": 4, "amp": -0.02, "base": 1}},
+    "dy": {"onda": {"periodo": 4, "amp": -1.5}},
+    "kL": 0.8
+  },
+  "trilhas": [
+    {
+      "nome": "piscada",
+      "ciclo": 4.2,
+      "fases": [
+        {"de": 0, "dur": 0.14, "pisca": 1}
+      ]
+    },
+    {
+      "nome": "olhada de relance",
+      "ciclo": 6.3,
+      "fases": [
+        {"de": 5.0, "dur": 1.1, "nota": "meia onda de 1,1 s (período 2,2): olha para cima e para o lado e volta",
+         "olhaX": {"onda": {"periodo": 2.2, "amp": 12, "x": "s"}},
+         "olhaY": {"onda": {"periodo": 2.2, "amp": -7, "x": "s"}},
+         "kL": 0.9}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "zz", "periodo": 2.6}
+  ]
+}

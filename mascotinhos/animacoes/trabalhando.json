@@ -1,0 +1,18 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "trabalhando",
+  "ordem": 2,
+  "descricao": "Trabalhando: quica no lugar (amassa ao tocar o chão), olha de um lado para o outro e mostra três pontinhos.",
+  "campos": {
+    "dy": {"quique": {"periodo": 0.7, "amp": -12}},
+    "sy": {"quique": {"periodo": 0.7, "medida": "amasso", "amp": -0.06, "base": 1}},
+    "sx": {"quique": {"periodo": 0.7, "medida": "amasso", "amp": 0.04, "base": 1}},
+    "olhaX": {"onda": {"periodo": 1.6, "amp": 16}},
+    "olhaY": {"quique": {"periodo": 0.7, "amp": 5}},
+    "kL": 0.95
+  },
+  "extras": [
+    {"tipo": "pontinhos", "periodo": 1.2, "defasagem": 1.1}
+  ]
+}

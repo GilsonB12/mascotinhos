@@ -1,0 +1,33 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "dancando",
+  "ordem": 10,
+  "descricao": "Exemplo: balança de um lado para o outro no ritmo, com um passinho a cada 1,2 s e brilhos em volta.",
+  "campos": {
+    "rot": {"onda": {"periodo": 1.2, "amp": 7}},
+    "dx": {"onda": {"periodo": 1.2, "amp": 10}},
+    "olhaX": {"onda": {"periodo": 1.2, "amp": 10, "fase": 0.1}},
+    "kL": 0.9
+  },
+  "trilhas": [
+    {
+      "nome": "passinho",
+      "ciclo": 0.6,
+      "fases": [
+        {"de": 0, "dur": 0.1, "nota": "agacha um pouco",
+         "sy": {"rampa": {"base": 1, "amp": -0.06}},
+         "sx": {"rampa": {"base": 1, "amp": 0.04}}},
+        {"de": 0.1, "dur": 0.3, "nota": "sobe e desce",
+         "dy": {"arco": {"amp": -14}},
+         "sy": {"soma": [{"rampa": {"de": 0.94, "para": 1, "escala": 2}}, {"arco": {"amp": 0.04}}]},
+         "sx": {"rampa": {"de": 1.04, "para": 1, "escala": 2}}},
+        {"de": 0.4, "nota": "assenta",
+         "sy": {"mola": {"amortece": 12, "rad": 40, "amp": 0.03, "base": 1}}}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "brilhos", "periodo": 1.2}
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "esperando",
+  "ordem": 3,
+  "descricao": "Esperando você: inclinado, balançando a cabeça, dá pulinhos no lugar com um \"?\" em cima.",
+  "campos": {
+    "rot": {"onda": {"periodo": 2.2, "amp": 2, "base": -6}},
+    "kL": 1.15,
+    "kW": 1.08,
+    "olhaY": -4
+  },
+  "trilhas": [
+    {
+      "nome": "pulinho",
+      "ciclo": 1.9,
+      "fases": [
+        {"de": 0, "dur": 0.14, "nota": "agacha (antecipação)",
+         "sy": {"rampa": {"base": 1, "amp": -0.1}},
+         "sx": {"rampa": {"base": 1, "amp": 0.07}},
+         "olhaY": -1},
+        {"de": 0.14, "dur": 0.44, "nota": "no ar: estica na subida e volta ao normal",
+         "dy": {"arco": {"amp": -26}},
+         "sy": {"soma": [{"rampa": {"de": 0.9, "para": 1, "escala": 2.2}}, {"arco": {"amp": 0.07}}]},
+         "sx": {"soma": [{"rampa": {"de": 1.07, "para": 1, "escala": 2.2}}, {"arco": {"amp": -0.04}}]},
+         "olhaY": {"arco": {"amp": -3, "base": -4}}},
+        {"de": 0.58, "dur": 0.22, "nota": "amassa ao pousar",
+         "sy": {"arco": {"amp": -0.09, "base": 1}},
+         "sx": {"arco": {"amp": 0.06, "base": 1}}},
+        {"de": 0.8, "nota": "balanço que se amortece até o próximo pulo",
+         "sy": {"mola": {"amortece": 9, "rad": 30, "amp": 0.03, "base": 1}},
+         "sx": {"mola": {"amortece": 9, "rad": 30, "amp": -0.02, "base": 1}}}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "interrogacao", "periodo": 1.9, "segue_pulo": true}
+  ]
+}

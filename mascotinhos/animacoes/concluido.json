@@ -1,0 +1,34 @@
+{
+  "formato": "mascotinhos/animacao",
+  "versao": 1,
+  "estado": "concluido",
+  "ordem": 6,
+  "descricao": "Terminou: um pulinho de satisfação com olhos em arco (^ ^) e um ✓; depois só respira, sem nada agitado.",
+  "olhos": "felizes",
+  "campos": {
+    "olhaY": -3
+  },
+  "trilhas": [
+    {
+      "nome": "pulinho de satisfação",
+      "fases": [
+        {"de": 0, "dur": 0.16, "nota": "agacha",
+         "sy": {"rampa": {"base": 1, "amp": -0.08}},
+         "sx": {"rampa": {"base": 1, "amp": 0.06}}},
+        {"de": 0.16, "dur": 0.94, "nota": "pulinho",
+         "dy": {"arco": {"amp": -24}},
+         "sy": {"soma": [{"rampa": {"de": 0.92, "para": 1, "escala": 2}}, {"arco": {"amp": 0.06}}]},
+         "sx": {"soma": [{"rampa": {"de": 1.06, "para": 1, "escala": 2}}, {"arco": {"amp": -0.03}}]}},
+        {"de": 1.1, "nota": "depois respira devagar e balança de leve, até o estado acabar",
+         "sy": {"onda": {"periodo": 3.4, "x": "s", "amp": 0.025, "base": 1}},
+         "sx": {"onda": {"periodo": 3.4, "x": "s", "amp": -0.015, "base": 1}},
+         "dy": {"onda": {"periodo": 3.4, "x": "s", "amp": -1.2}},
+         "rot": {"onda": {"periodo": 6.8, "x": "s", "amp": 2.5}}}
+      ]
+    }
+  ],
+  "extras": [
+    {"tipo": "check", "cresce": 0.6, "periodo": 2.6, "segue_pulo": true},
+    {"tipo": "brilhos", "periodo": 3.0}
+  ]
+}

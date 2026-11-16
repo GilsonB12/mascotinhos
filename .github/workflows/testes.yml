@@ -22,10 +22,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-        include:
-          # o mínimo do pyproject (requires-python >= 3.9): o setup-python só tem o 3.9 para Linux
-          - os: ubuntu-latest
-            python: "3.9"
     env:
       PYTHONUTF8: "1"
       PYTHONIOENCODING: utf-8

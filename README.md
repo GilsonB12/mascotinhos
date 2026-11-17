@@ -878,6 +878,12 @@ máquina; com a variável `CI` definida (os servidores de teste), viram só um t
 
 ## Licença
 
-MIT (ver `LICENSE`). O formato das formas é o contrato v1 do open-bot-avatar (MIT, © Dominik Scholz); nenhum código de
-lá está aqui. Bolota, Broto e Fantasma foram desenhados para esta biblioteca. Os nove mascotes do Ombro foram desenhados por
-Jonas Timbaúba e João Vitor Lima para o Ombro Screen.
+MIT (ver `LICENSE`), © 2026 Jonas Timbaúba, João Vitor Lima e Gilson Bezerra.
+
+O mascotinhos nasceu do [Ombro Screen](https://github.com/jvrodrigs/ombro-screen) (MIT, © 2026 Ombro Screen
+contributors): o movimento do pacote `classico`, a leitura das formas, o desenho do corpo e dos olhos, os sete extras
+originais e as nove formas do Ombro vêm de lá. O `NOTICE` lista essas partes e traz o aviso do Ombro Screen, que vai
+junto com elas. Os nove mascotes do Ombro foram desenhados por Jonas Timbaúba e João Vitor Lima para o Ombro Screen;
+Bolota, Broto e Fantasma foram desenhados para esta biblioteca.
+
+O formato das formas é o contrato v1 do open-bot-avatar (MIT, © 2026 Dominik Scholz); nenhum código de lá está aqui.

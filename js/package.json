@@ -19,7 +19,9 @@
     "index.d.ts",
     "src/",
     "dados/",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "sideEffects": false,
   "scripts": {

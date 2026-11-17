@@ -181,11 +181,11 @@ vontade, inclusive no `StrictMode`.
 
 ## Como o app do Ombro trocaria o renderizador
 
-Hoje o app desenha com o `open-bot-avatar` e põe os extras por CSS. Os passos, sem mexer em nada fora de
-`codigo/app/`:
+Isto é um roteiro, não algo já feito: hoje o app do Ombro desenha com o `open-bot-avatar` e põe os extras por CSS. Os
+passos, sem mexer em nada fora de `app/`:
 
 1. **Dependência** (`package.json`): trocar `"open-bot-avatar": "0.2.1"` por `"mascotinhos"` (a pasta `js/`
-   copiada em `vendor/mascotinhos` com `"file:vendor/mascotinhos"`, ou a versão do npm quando for publicada).
+   copiada em `vendor/mascotinhos` com `"file:vendor/mascotinhos"`, ou uma versão do npm fixada).
 2. **`src/features/avatars/catalog.ts`**: `validateAvatar(defs[id])` vira `validarDefinicao(defs[id], id)` (`erros`
    vazio = ok; os nove avatares de `avatars/defs/` passam sem erro nem aviso) e `lerDefinicao` para o valor;
    `AvatarDefinition` vira `DadosForma`. `moodFor` e o tipo `AvatarMotion` saem: o motor toca direto os seis estados
@@ -249,8 +249,10 @@ A geometria é a mesma (corpo, olhos, extras, giro, câmera, chão). O que muda 
   Pillow para imitar o borrão. No SVG o brilho do chão fica mais largo (ver `comparacao_3d_volume.png`).
 - **Transparências**: o SVG mistura; o Pillow substitui o pixel. Onde um extra translúcido passa por cima do corpo (o
   confete do `reset`, a gota do `alerta`), a cor difere.
-- **Texto** (zZ): `JetBrains Mono, ui-monospace, Menlo, monospace` em negrito, no lugar da fonte padrão do Pillow. A
-  posição é a mesma; o desenho da letra, não.
+- **Texto** (zZ): `JetBrains Mono, ui-monospace, Menlo, monospace` em negrito. O player não traz a fonte: sem a
+  JetBrains Mono instalada ou carregada pela página (um `@font-face` de quem usa), sai a fonte monoespaçada do
+  sistema. No Python, o texto sai com a fonte padrão do Pillow, ou com a JetBrains Mono Bold que vem no pacote Python
+  quando se pede (`fonte_jetbrains_mono()`). A posição é a mesma; o desenho da letra pode não ser.
 - **Antisserrilhado** e o redimensionamento LANCZOS da telinha não existem aqui: o SVG é nítido em qualquer tamanho.
 - **Terminal**: as letras e as células são as mesmas; o acabamento é aproximado. As linhas de varredura são uma
   máscara SVG (a mesma geometria: uma linha de pontos sim, outra não, `1 - varredura` mais fraca). O halo é um
@@ -271,6 +273,5 @@ A geometria é a mesma (corpo, olhos, extras, giro, câmera, chão). O que muda 
 
 ## Falta
 
-- **Publicar no npm** (o `package.json` já tem `exports`, `types` e `files`).
 - Olhos que seguem o ponteiro (o `follow` do app de hoje).
 - A fonte TTF no terminal (`Terminal.fonte` do Python).

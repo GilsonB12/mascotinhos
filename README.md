@@ -589,8 +589,9 @@ pip install mascotinhos                                              # a versão
 pip install "mascotinhos @ git+https://github.com/GilsonB12/mascotinhos"   # o que está no repositório
 ```
 
-A JetBrains Mono Bold (ver [A fonte do texto](#a-fonte-do-texto)) ainda não está em nenhuma versão publicada: a 0.1.0
-não a traz. Ou copie a pasta `mascotinhos/` para o seu projeto: ela não depende de nada além do Pillow.
+A JetBrains Mono Bold (ver [A fonte do texto](#a-fonte-do-texto)) vem a partir da 0.2.0; a 0.1.0 não a traz.
+
+Ou copie a pasta `mascotinhos/` para o seu projeto: ela não depende de nada além do Pillow.
 
 ## A API em poucas linhas
 

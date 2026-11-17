@@ -24,7 +24,7 @@ from .terminal import Terminal
 from .volume import Volume
 from .svg import desenhar_svg, quadro_svg
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "FAMILIAS", "ReceitaInvalida", "aleatorios", "conferir_receita", "cor_da_receita", "gerar", "receita_aleatoria",
     "Animacao", "AnimacaoInvalida", "Animador", "Biblioteca", "CAMPOS", "DURACAO_MISTURA", "Definicao",

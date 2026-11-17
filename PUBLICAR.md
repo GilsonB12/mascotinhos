@@ -30,7 +30,7 @@ duas publicações quando sai uma Release no GitHub, mas só depois de configura
 2. A **primeira** publicação precisa de um token (a publicação confiável do npm se configura num pacote que já
    existe). Em **Access Tokens → Generate New Token → Granular Access Token**, dê permissão de leitura e escrita em
    pacotes, e guarde o token no GitHub em **Settings → Secrets and variables → Actions → Secrets** como `NPM_TOKEN`.
-   (Ou publique a primeira vez do seu computador: `cd js`, copie o `LICENSE` da raiz para `js/`, `npm login` e
+   (Ou publique a primeira vez do seu computador: `cd js`, copie o `LICENSE` e o `NOTICE` da raiz para `js/`, `npm login` e
    `npm publish --access public`.)
 3. Crie a variável `PUBLICAR_NPM` com o valor `sim`.
 4. Depois da primeira publicação, troque o token pela publicação confiável: no npmjs.com, **Packages → mascotinhos →
@@ -49,4 +49,6 @@ duas publicações quando sai uma Release no GitHub, mas só depois de configura
    testes e publica.
 
 Sem o GitHub Actions, do seu computador: `python -m pip install build twine`, `python -m build` e
-`python -m twine upload dist/*` (com um token do PyPI), e `cd js && npm publish --access public`.
+`python -m twine upload dist/*` (com um token do PyPI), e
+`cd js && cp ../LICENSE ../NOTICE . && npm publish --access public` (apague as duas cópias depois: elas não entram no
+repositório).

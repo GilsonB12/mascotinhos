@@ -7,6 +7,8 @@ As mudanças que importam para quem usa o mascotinhos ficam aqui. O formato segu
 
 ## [Não publicado]
 
+## [0.2.0] - 2026-11-17
+
 ### Adicionado
 
 - **A JetBrains Mono Bold** 2.304 (a mesma do Ombro Screen, sem modificação) no pacote Python, em
@@ -23,6 +25,8 @@ As mudanças que importam para quem usa o mascotinhos ficam aqui. O formato segu
 
 - A licença no `pyproject.toml` passa a ser `MIT AND OFL-1.1` (o código continua MIT; a fonte é OFL), com `LICENSE`,
   `NOTICE` e `OFL.txt` nos arquivos de licença do pacote.
+- O `pyproject.toml` acha as pastas de dados (`animacoes*/`, `formas_exemplo/`, `fontes/`) como pacotes de dados, e
+  o setuptools para de avisar que elas seriam ignoradas. O wheel e o sdist levam os mesmos arquivos de antes.
 
 ### Corrigido
 
@@ -60,5 +64,6 @@ A primeira versão.
   `docs/3d.md` e `docs/terminal.md`.
 - **Testes**: as referências de movimento e de pixels no Python, e a paridade do player JavaScript com o Python.
 
-[Não publicado]: https://github.com/GilsonB12/mascotinhos/compare/v0.1.0...HEAD
+[Não publicado]: https://github.com/GilsonB12/mascotinhos/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/GilsonB12/mascotinhos/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/GilsonB12/mascotinhos/releases/tag/v0.1.0

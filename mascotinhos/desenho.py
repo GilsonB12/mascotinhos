@@ -5,9 +5,12 @@ os padrões daqui. A camada sai em `s` vezes o tamanho (supersampling): quem a u
 """
 from __future__ import annotations
 
+import io
 import math
 from dataclasses import dataclass, field, replace
 from functools import lru_cache
+from importlib import resources
+from pathlib import Path
 from typing import Callable, Optional, Sequence, Tuple, Union
 
 from PIL import Image, ImageDraw, ImageFont
@@ -46,6 +49,46 @@ def fonte_padrao(arquivo: Optional[str] = None, s: int = 2) -> Callable[[float],
             return ImageFont.load_default(tam * s)
         except TypeError:  # Pillow < 10.1: só a fonte bitmap, de tamanho fixo
             return ImageFont.load_default()
+
+    return fonte
+
+
+# A JetBrains Mono Bold (2.304, a mesma do Ombro Screen) vem com a biblioteca, com a licença dela (OFL-1.1) ao lado,
+# em mascotinhos/fontes/. Não é a padrão: quem quiser o texto (o zZ) como o Ombro desenha passa Estilo(fonte=...).
+JETBRAINS_MONO_BOLD = "JetBrainsMono-Bold.ttf"
+
+
+def _recurso_jetbrains_mono():
+    return resources.files(__package__).joinpath("fontes").joinpath(JETBRAINS_MONO_BOLD)
+
+
+def arquivo_jetbrains_mono() -> Path:
+    """O caminho da JetBrains Mono Bold que vem com a biblioteca (para quem pede um arquivo, como o --fonte da linha
+    de comando ou Terminal(fonte=...)). Vale de onde quer que o pacote esteja instalado, menos de dentro de um zip."""
+    arq = Path(str(_recurso_jetbrains_mono()))
+    if not arq.is_file():
+        raise FileNotFoundError(f"a fonte {JETBRAINS_MONO_BOLD} não está em {arq.parent} (o pacote está num zip?): "
+                                "use fonte_jetbrains_mono(), que lê do pacote sem precisar de um arquivo")
+    return arq
+
+
+@lru_cache(maxsize=1)
+def _bytes_jetbrains_mono() -> bytes:
+    return _recurso_jetbrains_mono().read_bytes()
+
+
+@lru_cache(maxsize=8)
+def fonte_jetbrains_mono(s: int = 2) -> Callable[[float], ImageFont.FreeTypeFont]:
+    """A JetBrains Mono Bold que vem com a biblioteca, no formato de Estilo.fonte: recebe o tamanho em pixels da tela e
+    devolve a fonte já em `s` vezes. Com ela, o pacote "classico" desenha o zZ com os mesmos pixels do Ombro Screen.
+
+      estilo = Estilo(fonte=fonte_jetbrains_mono())          # s = 2, o do Enquadramento padrão
+    """
+    dados = _bytes_jetbrains_mono()
+
+    @lru_cache(maxsize=32)
+    def fonte(tam: float) -> ImageFont.FreeTypeFont:
+        return ImageFont.truetype(io.BytesIO(dados), tam * s)
 
     return fonte
 

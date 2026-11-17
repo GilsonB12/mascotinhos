@@ -12,7 +12,8 @@ primitivas de movimento.py). Ver README.md e GUIA_IA.md.
 from .animacao import (AnimacaoInvalida, Animacao, Biblioteca, biblioteca_padrao, carregar_animacao, ler_animacao, pacotes,
                        validar_animacao)
 from .animador import DURACAO_MISTURA, REALCE, TRANSICAO, Animador, cor_sorteada
-from .desenho import Estilo, Forma, Paleta, desenhar, fonte_padrao, forma_de, quadro
+from .desenho import (Estilo, Forma, Paleta, arquivo_jetbrains_mono, desenhar, fonte_jetbrains_mono, fonte_padrao, forma_de,
+                      quadro)
 from .formas import (Definicao, DefinicaoInvalida, Olhos, carregar_definicao, carregar_pasta, cor_hex, cor_sugerida,
                      cores_da_pasta, dentro,
                      exemplos, ler_definicao, poligonos, validar_definicao)
@@ -23,12 +24,12 @@ from .terminal import Terminal
 from .volume import Volume
 from .svg import desenhar_svg, quadro_svg
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "FAMILIAS", "ReceitaInvalida", "aleatorios", "conferir_receita", "cor_da_receita", "gerar", "receita_aleatoria",
     "Animacao", "AnimacaoInvalida", "Animador", "Biblioteca", "CAMPOS", "DURACAO_MISTURA", "Definicao",
     "DefinicaoInvalida", "Enquadramento", "Estilo", "Forma", "NEUTRO", "Olhos", "Paleta", "REALCE", "TRANSICAO", "Terminal", "Volume",
-    "biblioteca_padrao", "carregar_animacao", "carregar_definicao", "carregar_pasta", "cor_hex", "cor_sorteada", "cor_sugerida", "cores_da_pasta",
-    "dentro", "desenhar", "desenhar_svg", "exemplos", "fonte_padrao", "forma_de", "ler_animacao", "ler_definicao",
+    "arquivo_jetbrains_mono", "biblioteca_padrao", "carregar_animacao", "carregar_definicao", "carregar_pasta", "cor_hex", "cor_sorteada", "cor_sugerida", "cores_da_pasta",
+    "dentro", "desenhar", "desenhar_svg", "exemplos", "fonte_jetbrains_mono", "fonte_padrao", "forma_de", "ler_animacao", "ler_definicao",
     "misturar", "pacotes", "poligonos", "quadro", "quadro_svg", "validar_animacao", "validar_definicao",
 ]

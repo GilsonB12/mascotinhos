@@ -1,0 +1,60 @@
+mascotinhos
+Copyright (c) 2026 Jonas Timbaúba, João Vitor Lima e Gilson Bezerra
+Licenciado sob a licença MIT (ver LICENSE).
+
+Este arquivo registra a origem das partes que não nasceram aqui e os avisos que precisam ir junto com elas. Ele não
+muda os termos de uso: tudo o que está abaixo é distribuído sob a licença indicada em cada item.
+
+
+1. Partes derivadas do Ombro Screen
+-----------------------------------
+
+O mascotinhos nasceu do Ombro Screen (https://github.com/jvrodrigs/ombro-screen): o mascote animado da telinha do
+Ombro foi separado do programa e virou esta biblioteca. As partes abaixo derivam do código e dos dados do Ombro
+Screen (os arquivos mascote.py, avatares.py e avatars/ de lá), diretamente ou como tradução para JavaScript:
+
+  mascotinhos/formas.py        a leitura do path SVG, a regra nonzero e a conferência das formas (de avatares.py)
+  mascotinhos/palco.py         o palco, as unidades e as contas do corpo e dos olhos (de mascote.py)
+  mascotinhos/movimento.py     as primitivas que reproduzem o movimento dos estados (de mascote.py)
+  mascotinhos/animacoes/       o pacote "classico": os seis estados do mascote (de mascote.py)
+  mascotinhos/animador.py      a mistura de estados, a troca de forma e o realce de cor (de mascote.py)
+  mascotinhos/desenho.py       o desenho com Pillow do corpo e dos olhos (de mascote.py)
+  mascotinhos/extras.py        os sete extras originais: zz, pontinhos, interrogacao, gota, confete, check e
+                               brilhos (de mascote.py)
+  mascotinhos/formas_exemplo/  as nove formas do Ombro (ombro-cloud, sereno, orbita, cubo, scout, pixel, chevron,
+                               maestro e nova) e as cores delas em _cores.json (de avatars/)
+  js/src/                      a tradução para JavaScript das partes acima (formas.js, palco.js, movimento.js,
+                               animador.js, desenho.js e extras.js)
+  js/dados/                    a cópia, gerada por js/scripts/sincronizar.mjs, dos dados acima
+
+As nove formas do Ombro foram desenhadas por Jonas Timbaúba e João Vitor Lima para o Ombro Screen. Bolota, Broto e
+Fantasma, os pacotes "vivo", "3d" e "terminal", o volume, o estilo terminal, a fonte de pontos, o gerador, o SVG e o
+player em JavaScript foram feitos para o mascotinhos.
+
+O aviso do Ombro Screen, que vale para essas partes:
+
+  Copyright (c) 2026 Ombro Screen contributors
+
+  Licenciado sob a licença MIT, com o mesmo texto de permissão que está em LICENSE.
+
+
+2. O formato das formas (open-bot-avatar)
+-----------------------------------------
+
+As formas seguem o contrato v1 do formato do open-bot-avatar (https://github.com/DominikScholz/open-bot-avatar,
+MIT, Copyright (c) 2026 Dominik Scholz): um path SVG numa caixa 0..100 e o par de olhos. Só o formato é usado;
+nenhum código do open-bot-avatar está no mascotinhos.
+
+
+3. A fonte JetBrains Mono Bold
+------------------------------
+
+  mascotinhos/fontes/JetBrainsMono-Bold.ttf   JetBrains Mono Bold, versão 2.304, sem modificação
+  mascotinhos/fontes/OFL.txt                  a licença da fonte
+
+Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+
+A fonte é distribuída sob a SIL Open Font License, Version 1.1 (texto completo em mascotinhos/fontes/OFL.txt), e não
+sob a licença MIT. O arquivo é o da tag v2.304 do repositório oficial (fonts/ttf/JetBrainsMono-Bold.ttf, SHA-256
+5590990c82e097397517f275f430af4546e1c45cff408bde4255dad142479dcb), o mesmo que o Ombro Screen usa. Ela vai só no pacote
+Python; o player em JavaScript não a traz.

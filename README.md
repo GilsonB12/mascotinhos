@@ -435,19 +435,15 @@ python -m mascotinhos folha --pacote terminal --so bolota,orbita,cubo --estados 
 Outros comandos: `python -m mascotinhos listar` (os mascotes e os estados), `tira` (quadros lado a lado), `svg`,
 `validar` (ver [Linha de comando](#linha-de-comando)). As imagens desta página são feitas por `docs/gerar_exemplos.py`.
 
-### No Ombro Screen
+### Num programa seu
 
-Um programa que usa a biblioteca escolhe quais opções mostra para quem usa. O Ombro Screen, por exemplo, expõe quatro
-chaves no `config.json` dele:
+Um programa que usa a biblioteca escolhe quais destas opções mostra para quem usa: o pacote (`classico`, `vivo`, `3d`,
+`terminal`), o jeito de desenhar (`chapado`, `volume`, `terminal`) e, no terminal, a tinta e o fósforo. Por dentro são
+duas linhas: `Biblioteca.carregar(pacote=...)` e `Estilo(volume=... | terminal=Terminal(...))`. Num estado de alerta,
+o programa passa o valor real em `Terminal(dados={"limite": ...})`.
 
-| Chave | Valores | O que liga |
-| --- | --- | --- |
-| `animacoes` | `classico`, `vivo`, `3d`, `terminal` | o pacote de animações |
-| `mascote_estilo` | `chapado`, `volume`, `terminal` | como desenhar |
-| `terminal_tinta`, `terminal_fosforo` | `ascii`, `blocos`, `contorno`; `verde`, `ambar`, `branco`, `mascote`, `#RRGGBB` | a tinta e a cor do estilo terminal |
-
-Por dentro são duas linhas: `Biblioteca.carregar(pacote=...)` e `Estilo(volume=... | terminal=Terminal(...))`. No
-alerta, ele passa o uso real em `Terminal(dados={"limite": ...})`.
+O Ombro Screen, de onde a biblioteca veio, ainda desenha com o mascote próprio dele (o `mascote.py`), cujo movimento é
+o do pacote `classico`; ele não usa o mascotinhos nem tem essas opções na configuração.
 
 ## Crie o seu mascote
 
@@ -554,8 +550,9 @@ eles vão sozinhos para o maior espaço livre do rosto. Toda forma que sai passa
 - **Só Pillow.** Nada de numpy, rede ou download: roda dentro de um app assinado e notarizado.
 - **Sem layout.** O tamanho, as cores e a fonte vêm de quem usa (ou dos padrões daqui).
 - **Python 3.9 ou mais novo.** Pillow 10 ou mais novo.
+- **A JetBrains Mono Bold vem junto** (no pacote Python, com a licença OFL dela), para o texto sair como no Ombro
+  Screen. Só vale quando você pede (ver [A fonte do texto](#a-fonte-do-texto)).
 
-</content>
 ## O que tem aqui
 
 | Arquivo | O que é |
@@ -588,8 +585,11 @@ eles vão sozinhos para o maior espaço livre do rosto. Toda forma que sai passa
 ## Instalar
 
 ```bash
-pip install "mascotinhos @ git+https://github.com/GilsonB12/mascotinhos"
+pip install mascotinhos                                              # a versão do PyPI
+pip install "mascotinhos @ git+https://github.com/GilsonB12/mascotinhos"   # o que está no repositório
 ```
+
+A JetBrains Mono Bold (ver [A fonte do texto](#a-fonte-do-texto)) vem a partir da 0.2.0; a 0.1.0 não a traz.
 
 Ou copie a pasta `mascotinhos/` para o seu projeto: ela não depende de nada além do Pillow.
 
@@ -616,6 +616,24 @@ camada = a.camada(agora)                                 # o quadro de agora
 O tamanho e o estilo: `oa.Estilo(enquadramento=oa.Enquadramento(largura, altura, altura_util, s), paleta=oa.Paleta(...),
 fonte=minha_fonte)`. A camada sai em `s` vezes (supersampling): reduza com `Image.LANCZOS` ao compor a tela, como o
 Ombro faz. `fonte(tam)` recebe o tamanho em pixels da tela e devolve a fonte já em `s` vezes; sem ela, vale a do Pillow.
+
+### A fonte do texto
+
+O texto dos extras (o z z Z de quem dorme e, fora do estilo terminal, os textos do pacote `terminal`) sai com a fonte do
+`Estilo`. Sem nada, é a padrão do Pillow, como sempre foi. A biblioteca traz a **JetBrains Mono Bold** (2.304, a mesma
+do Ombro Screen) em `mascotinhos/fontes/`, com a licença dela (`OFL.txt`):
+
+```python
+estilo = oa.Estilo(fonte=oa.fonte_jetbrains_mono())      # s = 2, o do Enquadramento padrão
+oa.quadro(oa.exemplos()["ombro-cloud"], "ocioso", 1.0, estilo=estilo)
+oa.arquivo_jetbrains_mono()                              # o caminho do .ttf, para quem pede um arquivo
+```
+
+Com ela, o pacote `classico` desenha os mesmos pixels que o mascote do Ombro Screen (`tests/test_ombro.py`). Com outro
+`s` no enquadramento, passe o mesmo: `fonte_jetbrains_mono(s=3)`. Na linha de comando, `--fonte` recebe o arquivo:
+`--fonte "$(python -c 'import mascotinhos; print(mascotinhos.arquivo_jetbrains_mono())')"`. A fonte não muda o estilo
+terminal (ele usa a fonte de pontos dele) nem o SVG: o SVG pede `JetBrains Mono` pelo nome e, sem ela instalada, cai
+numa fonte do sistema. O player em JavaScript não traz a fonte.
 
 Mais baixo nível: `forma_de(definicao)` põe a forma no palco; `desenhar(forma, p, animacao, t, cor, alpha_extras,
 estilo)` e `desenhar_svg(...)` desenham uma pose `p` qualquer (os campos abaixo); `Animacao.parametros(t)` dá a pose
@@ -869,15 +887,27 @@ FreeType em que foram gerados; em outras, é pulado). `tests/test_gerador.py` pa
 extremos dos parâmetros e duzentas receitas sorteadas pelos três estilos. Os limites de tempo por quadro valem na sua
 máquina; com a variável `CI` definida (os servidores de teste), viram só um teto folgado. Mudou o desenho de propósito? `python tests/test_referencia.py --gerar`.
 
+`tests/test_fonte.py` confere a JetBrains Mono Bold que vem junto (o arquivo oficial, a Bold, as letras dos textos, o
+carregamento de qualquer pasta) e que, sem pedir, o desenho não muda. `tests/test_ombro.py` confere que o pacote
+`classico`, com essa fonte, desenha os mesmos pixels que o mascote do Ombro Screen: as nove formas do Ombro nos seis
+estados e uma sequência com trocas de estado e de forma. Com `MASCOTINHOS_OMBRO=/caminho/do/ombro-screen`, compara ao
+vivo com o código do Ombro (que precisa das dependências dele); sem ela, com `tests/referencias_ombro.json`, desenhadas
+pelo próprio Ombro (só no ambiente em que foram geradas; em outros, é pulado). Para acrescentar o seu ambiente:
+`MASCOTINHOS_OMBRO=... python tests/test_ombro.py --gerar`.
+
 ## O que vem depois
 
-- **Fase 2, o player do app:** o mesmo JSON tocado em TypeScript (as seis primitivas, as fases e os extras são poucas
-  linhas cada), conferido contra `svg.py` com os mesmos instantes de `tests/test_referencia.py`.
 - **Mais famílias e enfeites no gerador** (ver [Crie o seu mascote](#crie-o-seu-mascote)): hoje são dez famílias e
   três enfeites; uma família nova é uma função pequena em `mascotinhos/gerador.py` e a irmã dela em `js/src/gerador.js`.
 
 ## Licença
 
-MIT (ver `LICENSE`). O formato das formas é o contrato v1 do open-bot-avatar (MIT, © Dominik Scholz); nenhum código de
-lá está aqui. Bolota, Broto e Fantasma foram desenhados para esta biblioteca. Os nove mascotes do Ombro foram desenhados por
-Jonas Timbaúba e João Vitor Lima para o Ombro Screen.
+MIT (ver `LICENSE`), © 2026 Jonas Timbaúba, João Vitor Lima e Gilson Bezerra.
+
+O mascotinhos nasceu do [Ombro Screen](https://github.com/jvrodrigs/ombro-screen) (MIT, © 2026 Ombro Screen
+contributors): o movimento do pacote `classico`, a leitura das formas, o desenho do corpo e dos olhos, os sete extras
+originais e as nove formas do Ombro vêm de lá. O `NOTICE` lista essas partes e traz o aviso do Ombro Screen, que vai
+junto com elas. Os nove mascotes do Ombro foram desenhados por Jonas Timbaúba e João Vitor Lima para o Ombro Screen;
+Bolota, Broto e Fantasma foram desenhados para esta biblioteca.
+
+O formato das formas é o contrato v1 do open-bot-avatar (MIT, © 2026 Dominik Scholz); nenhum código de lá está aqui.

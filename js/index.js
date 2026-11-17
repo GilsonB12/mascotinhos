@@ -29,7 +29,7 @@ export { Enquadramento, corpo, capsula, CX, BX0, BX1, BY0, BY1, VB_X, VB_Y, VB_W
 export { Volume, Projecao, Lente, corClara, corEscura, tem3d } from "./src/volume.js";
 export { ESQUEMAS as ESQUEMAS_EXTRAS, ANCORAS, CORES, FIGURAS } from "./src/extras.js";
 
-export const VERSAO = "0.1.0";
+export const VERSAO = "0.2.0";
 
 /**
  * As formas que vêm com a biblioteca, já conferidas, em ordem de id. Como no Python, o que começa com "_" não é

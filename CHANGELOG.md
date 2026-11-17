@@ -7,6 +7,34 @@ As mudanças que importam para quem usa o mascotinhos ficam aqui. O formato segu
 
 ## [Não publicado]
 
+## [0.2.0] - 2026-11-17
+
+### Adicionado
+
+- **A JetBrains Mono Bold** 2.304 (a mesma do Ombro Screen, sem modificação) no pacote Python, em
+  `mascotinhos/fontes/`, com a licença dela (SIL Open Font License 1.1, `OFL.txt`). Só vale quando se pede:
+  `Estilo(fonte=fonte_jetbrains_mono())`, e `arquivo_jetbrains_mono()` dá o caminho do `.ttf`. Sem pedir, o texto
+  continua na fonte padrão do Pillow e nenhum pixel muda. O player em JavaScript não traz a fonte.
+- **`NOTICE`**: a origem das partes que vêm do Ombro Screen, com o aviso dele (MIT, © 2026 Ombro Screen
+  contributors), o crédito ao formato do open-bot-avatar e o aviso da fonte. Vai junto no pacote Python e no do npm.
+- **Testes**: `tests/test_fonte.py` (a fonte que vem junto) e `tests/test_ombro.py` (o pacote `classico`, com a
+  JetBrains Mono, desenha os mesmos pixels que o mascote do Ombro Screen, ao vivo com `MASCOTINHOS_OMBRO` ou pelas
+  referências de `tests/referencias_ombro.json`).
+
+### Mudado
+
+- A licença no `pyproject.toml` passa a ser `MIT AND OFL-1.1` (o código continua MIT; a fonte é OFL), com `LICENSE`,
+  `NOTICE` e `OFL.txt` nos arquivos de licença do pacote.
+- O `pyproject.toml` acha as pastas de dados (`animacoes*/`, `formas_exemplo/`, `fontes/`) como pacotes de dados, e
+  o setuptools para de avisar que elas seriam ignoradas. O wheel e o sdist levam os mesmos arquivos de antes.
+
+### Corrigido
+
+- O README dizia que o Ombro Screen expõe as chaves `animacoes`, `mascote_estilo`, `terminal_tinta` e
+  `terminal_fosforo` no `config.json` dele; ele não usa o mascotinhos nem tem essas chaves. Também saíram a linha
+  `</content>` perdida em "Por dentro" e o plano de um player em TypeScript (o player em JavaScript já existe), e o
+  roteiro de troca do app do Ombro aponta para `app/`.
+
 ## [0.1.0] - 2026-11-16
 
 A primeira versão.
@@ -36,5 +64,6 @@ A primeira versão.
   `docs/3d.md` e `docs/terminal.md`.
 - **Testes**: as referências de movimento e de pixels no Python, e a paridade do player JavaScript com o Python.
 
-[Não publicado]: https://github.com/GilsonB12/mascotinhos/compare/v0.1.0...HEAD
+[Não publicado]: https://github.com/GilsonB12/mascotinhos/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/GilsonB12/mascotinhos/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/GilsonB12/mascotinhos/releases/tag/v0.1.0

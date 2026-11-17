@@ -2,8 +2,8 @@
 querer.
 
   - os parâmetros (dx, dy, sx...) de cada estado numa grade fina de instantes, arredondados a 7 casas: valem em
-    qualquer máquina. São os mesmos números do mascote antes de virar biblioteca (o Ombro Screen guarda as mesmas
-    referências no tests/golden/ dele);
+    qualquer máquina. São os mesmos números do mascote do Ombro Screen antes de virar biblioteca (a comparação com o
+    Ombro de hoje fica em tests/test_ombro.py);
   - o hash dos pixels das formas de exemplo em todos os estados: só vale na mesma plataforma e com as mesmas versões
     de Python, Pillow e FreeType; em outro ambiente o teste é pulado.
 

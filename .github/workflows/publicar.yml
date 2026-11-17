@@ -76,8 +76,8 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: testes
         run: node --test
-      - name: a licença vai junto no pacote
-        run: cp ../LICENSE LICENSE
+      - name: a licença e os avisos de atribuição vão junto no pacote
+        run: cp ../LICENSE ../NOTICE .
       - name: publica (com procedência)
         run: npm publish --provenance --access public
         env:

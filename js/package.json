@@ -1,6 +1,6 @@
 {
   "name": "mascotinhos",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "O player dos mascotinhos no navegador: os mesmos JSON de forma e de animação do pacote Python, as mesmas poses, desenhadas em SVG. Sem dependências.",
   "type": "module",
   "main": "./index.js",
@@ -19,7 +19,9 @@
     "index.d.ts",
     "src/",
     "dados/",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "sideEffects": false,
   "scripts": {

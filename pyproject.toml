@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mascotinhos"
-version = "0.1.0"
+version = "0.2.0"
 description = "Mascotes animados em Python puro: formas e animações em JSON, desenho com Pillow, saída em PNG, GIF e SVG."
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE"]
+license = "MIT AND OFL-1.1"
+license-files = ["LICENSE", "NOTICE", "mascotinhos/fontes/OFL.txt"]
 authors = [{ name = "Jonas Timbaúba" }, { name = "João Vitor Lima" }, { name = "Gilson Bezerra" }]
 requires-python = ">=3.9"
 dependencies = ["Pillow>=10.0"]
@@ -24,8 +24,12 @@ Repository = "https://github.com/GilsonB12/mascotinhos"
 [project.scripts]
 mascotinhos = "mascotinhos.cli:main"
 
-[tool.setuptools]
-packages = ["mascotinhos"]
+# As pastas de dados (os pacotes de animações, as formas e a fonte) entram como pacotes de dados, sem __init__.py:
+# o setuptools as acha pelo nome e leva só os arquivos listados em package-data.
+[tool.setuptools.packages.find]
+include = ["mascotinhos", "mascotinhos.*"]
+exclude = ["*.__pycache__"]
 
 [tool.setuptools.package-data]
-mascotinhos = ["animacoes/*.json", "animacoes_*/*.json", "formas_exemplo/*.json"]
+"*" = ["*.json"]                                  # animacoes/, animacoes_*/ (um pacote novo entra sozinho) e formas_exemplo/
+"mascotinhos.fontes" = ["*.ttf", "OFL.txt"]

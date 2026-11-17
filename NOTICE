@@ -44,3 +44,17 @@ O aviso do Ombro Screen, que vale para essas partes:
 As formas seguem o contrato v1 do formato do open-bot-avatar (https://github.com/DominikScholz/open-bot-avatar,
 MIT, Copyright (c) 2026 Dominik Scholz): um path SVG numa caixa 0..100 e o par de olhos. Só o formato é usado;
 nenhum código do open-bot-avatar está no mascotinhos.
+
+
+3. A fonte JetBrains Mono Bold
+------------------------------
+
+  mascotinhos/fontes/JetBrainsMono-Bold.ttf   JetBrains Mono Bold, versão 2.304, sem modificação
+  mascotinhos/fontes/OFL.txt                  a licença da fonte
+
+Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+
+A fonte é distribuída sob a SIL Open Font License, Version 1.1 (texto completo em mascotinhos/fontes/OFL.txt), e não
+sob a licença MIT. O arquivo é o da tag v2.304 do repositório oficial (fonts/ttf/JetBrainsMono-Bold.ttf, SHA-256
+5590990c82e097397517f275f430af4546e1c45cff408bde4255dad142479dcb), o mesmo que o Ombro Screen usa. Ela vai só no pacote
+Python; o player em JavaScript não a traz.

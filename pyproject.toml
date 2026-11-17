@@ -7,8 +7,8 @@ name = "mascotinhos"
 version = "0.1.0"
 description = "Mascotes animados em Python puro: formas e animações em JSON, desenho com Pillow, saída em PNG, GIF e SVG."
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE", "NOTICE"]
+license = "MIT AND OFL-1.1"
+license-files = ["LICENSE", "NOTICE", "mascotinhos/fontes/OFL.txt"]
 authors = [{ name = "Jonas Timbaúba" }, { name = "João Vitor Lima" }, { name = "Gilson Bezerra" }]
 requires-python = ">=3.9"
 dependencies = ["Pillow>=10.0"]
@@ -28,4 +28,4 @@ mascotinhos = "mascotinhos.cli:main"
 packages = ["mascotinhos"]
 
 [tool.setuptools.package-data]
-mascotinhos = ["animacoes/*.json", "animacoes_*/*.json", "formas_exemplo/*.json"]
+mascotinhos = ["animacoes/*.json", "animacoes_*/*.json", "formas_exemplo/*.json", "fontes/*.ttf", "fontes/OFL.txt"]

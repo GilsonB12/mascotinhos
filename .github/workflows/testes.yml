@@ -37,6 +37,16 @@ jobs:
       - name: o pacote instalado traz os JSON das animações e das formas
         working-directory: ${{ runner.temp }}
         run: python -m mascotinhos listar --pacote terminal
+      - name: o pacote instalado traz a JetBrains Mono Bold e a licença dela
+        working-directory: ${{ runner.temp }}
+        run: >-
+          python -c "import mascotinhos as oa;
+          f = oa.fonte_jetbrains_mono()(20);
+          assert f.getname() == ('JetBrains Mono', 'Bold'), f.getname();
+          arq = oa.arquivo_jetbrains_mono();
+          assert (arq.parent / 'OFL.txt').is_file();
+          oa.quadro(oa.exemplos()['ombro-cloud'], 'ocioso', 1.0, estilo=oa.Estilo(fonte=oa.fonte_jetbrains_mono()));
+          print(arq)"
 
   js:
     name: player JS · Node ${{ matrix.node }}
